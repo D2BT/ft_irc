@@ -2,58 +2,73 @@
 #include "../includes/Exception.hpp"
 #include "../includes/Logger.hpp"
 
+// Variable globale pour savoir si le serveur doit continuer à tourner
 volatile bool Server::g_running = true;
 
+// Constructeur du serveur IRC
+// Initialise le port, le mot de passe et les commandes IRC disponibles
 Server::Server(int port, std::string password): _port(port), _listenfd(-1), _password(password){
-    try {
-        _commands["NICK"] = new NickCommand();
-        _commands["USER"] = new UserCommand();
-        _commands["PASS"] = new PassCommand();
-        _commands["PING"] = new PingCommand();
-        _commands["MODE"] = new ModeCommand();
-        _commands["JOIN"] = new JoinCommand();
-        _commands["PRIVMSG"] = new PrivmsgCommand();
-        _commands["PART"] = new PartCommand();
-        _commands["KICK"] = new KickCommand();
-        _commands["QUIT"] = new QuitCommand();
-        _commands["TOPIC"] = new TopicCommand();
-        _commands["INVITE"] = new InviteCommand();
-    }
-    catch (std::bad_alloc & e) {
-        for(std::map<std::string, ICommand*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
-            delete it->second;
-        }
-        _commands.clear();
-        throw;
-    }
+	try {
+		// Création des objets pour chaque commande IRC prise en charge
+		_commands["NICK"] = new NickCommand();
+		_commands["USER"] = new UserCommand();
+		_commands["PASS"] = new PassCommand();
+		_commands["PING"] = new PingCommand();
+		_commands["MODE"] = new ModeCommand();
+		_commands["JOIN"] = new JoinCommand();
+		_commands["PRIVMSG"] = new PrivmsgCommand();
+		_commands["PART"] = new PartCommand();
+		_commands["KICK"] = new KickCommand();
+		_commands["QUIT"] = new QuitCommand();
+		_commands["TOPIC"] = new TopicCommand();
+		_commands["INVITE"] = new InviteCommand();
+	}
+	catch (std::bad_alloc & e) {
+		// Libère la mémoire en cas d'erreur d'allocation
+		for(std::map<std::string, ICommand*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
+			delete it->second;
+		}
+		_commands.clear();
+		throw;
+	}
 }
 
+// Destructeur du serveur IRC
+// Libère la mémoire des commandes et des clients, ferme les sockets
 Server::~Server(){
+	// Libère les commandes IRC
 	std::map<std::string, ICommand*>::iterator ite = _commands.begin();
-    for (; ite != _commands.end(); ++ite)
-        delete ite->second;
-    _commands.clear();
+	for (; ite != _commands.end(); ++ite)
+		delete ite->second;
+	_commands.clear();
 
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it){
-        close (it->first);
-        delete it->second;
-    }
-    _clients.clear();
+	// Libère les clients connectés
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it){
+		close (it->first);
+		delete it->second;
+	}
+	_clients.clear();
 
-    if (_listenFd != -1)
-        close (_listenFd);
+	// Ferme la socket d'écoute si elle existe
+	if (_listenFd != -1)
+		close (_listenFd);
 }
 
+// Prépare le serveur à écouter les connexions entrantes
 void Server::setup(){
+	// Crée la socket d'écoute (TCP)
 	_listenfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_listenfd < 0)
 		throw SocketError();
+	// Permet de réutiliser l'adresse rapidement après un crash
 	int opt = 1;
 	if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 		throw SocketError();
+	// Met la socket en mode non-bloquant (important pour poll/select)
 	if (fcntl(_listenfd, F_SETFL, O_NONBLOCK) < 0)
 		throw SocketError();
 
+	// Prépare la structure d'adresse pour l'écoute sur toutes les interfaces
 	sockaddr_in addr;
 	std::memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
