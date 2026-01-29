@@ -13,3 +13,11 @@ Les modes sont des options qui changent le comportement d’un salon (channel) I
 i : Invite-only. Seuls les invités peuvent rejoindre le channel.
 t : Seuls les opérateurs peuvent changer le topic du channel.
 k : Le channel est protégé par un mot de passe (key).
+
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes ./ircserv <port> <password>
+
+listen()
+Peut échouer si :
+La socket n’a pas été correctement créée ou bind (pas de bind avant listen).
+Le port est déjà utilisé par un autre programme.
+Tu n’as pas les droits nécessaires (ex : ports < 1024 sans sudo).
