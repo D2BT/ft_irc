@@ -21,3 +21,4 @@ Peut échouer si :
 La socket n’a pas été correctement créée ou bind (pas de bind avant listen).
 Le port est déjà utilisé par un autre programme.
 Tu n’as pas les droits nécessaires (ex : ports < 1024 sans sudo).
+message superieur a 512char

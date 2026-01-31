@@ -133,7 +133,7 @@ int  Server::acceptNewClient(){
 void Server::receiveFromClient(int fd){
 	char buffer[512];
 	// Lit les données envoyées par le client (non-bloquant)
-	size_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	size_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0); // ", 0" = comportement par defaut
 
 	// Si bytes_read == 0, le client a fermé la connexion
 	if (bytes_read == 0){
