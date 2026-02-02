@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../includes/Client.hpp"
+#include "../includes/ICmd.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -23,7 +24,7 @@ class Server{
 		int _listenfd;
 		std::string _password;
 		std::map<int, Client> _clients;
-		std::map<std::string, ICommand*> _commands;
+		std::map<std::string, ICmd*> _commands;
 		std::vector<pollfd> _pfds;
 
 		bool handleCommand(Client &client, std::string &line);
