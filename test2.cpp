@@ -6,7 +6,7 @@
 /*   By: max <max@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/03 18:32:29 by max              ###   ########.fr       */
+/*   Updated: 2026/02/03 20:35:17 by max              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,39 +61,40 @@ int main(int argc, char **argv){
                     socklen_t client_len = sizeof(client);
         
                     int fd_client = accept(serverSocket, (struct sockaddr*)&client, &client_len);
-                    if (fd_client >= 0)
-                        std::cout << "New client connected" << fd_client << std::endl;
-                        
-                    struct pollfd newClient; //structure d'observation d'evenement ainsi que son fd
-                    newClient.fd = fd_client;
-                    newClient.events = POLLIN; 
-                    newClient.revents = 0;
-                    vector_fds.push_back(newClient);                    
-                } 
-            }
-            else{ // message recu d'un client
-                char buffer[512];
-                int taille = recv(vector_fds[i].fd, buffer, sizeof(buffer) -1, 0);
-                
-                if (taille <= 0){ //erreur ou deconnextion
-                    std::cout << "Deconnexion client: " << vector_fds[i].fd << std::endl;
-                    close(vector_fds[i].fd);
-                    vector_fds.erase(vector_fds.begin() + i);
-                    i-- ; //recommence avec le meme i 
+					if (fd_client >= 0){
+						std::cout << "New client connected" << fd_client << std::endl;
+						
+						struct pollfd newClient; //structure d'observation d'evenement ainsi que son fd
+						newClient.fd = fd_client;
+						newClient.events = POLLIN; 
+						newClient.revents = 0;
+						vector_fds.push_back(newClient);
+					}
                 }
-                else{ //message recu
-                    buffer[taille] = '\0';
-                    std::cout << "Message de " << vector_fds[i].fd << ": " << buffer << std::endl;
-                }
-            }
-            
+                else { // message recu d'un client
+					char buffer[512];
+					int taille = recv(vector_fds[i].fd, buffer, sizeof(buffer) -1, 0);
+					
+					if (taille <= 0){ //erreur ou deconnextion
+						std::cout << "Deconnexion client: " << vector_fds[i].fd << std::endl;
+						close(vector_fds[i].fd);
+						vector_fds.erase(vector_fds.begin() + i);
+						i-- ; //recommence avec le meme i 
+					}
+					else{ //message recu
+						buffer[taille] = '\0';
+						std::cout << "Message de " << vector_fds[i].fd << ": " << buffer << std::endl;
+					}
+				}
+			}
         }
     }
 
-    for (size_t i = 0; i < vector_fds.size(); i++){
-        close(vector_fds[i].fd);
-    }
+	for (size_t i = 0; i < vector_fds.size(); i++){
+		close(vector_fds[i].fd);
+	}
 }
+
 
 // creation socket
 // bind
