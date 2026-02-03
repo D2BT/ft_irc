@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test2.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
+/*   By: max <max@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/03 14:54:55 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/03 18:32:29 by max              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,30 +37,61 @@ int main(int argc, char **argv){
     if (listen(serverSocket, MAX_CLIENT) == -1)
         return(std::cout << "Listen error" << std::endl, 1);
 
-    std::vector<struct pollfd> fds;
+    std::vector<struct pollfd> vector_fds;
     
     struct pollfd pollFdServer;
     
     pollFdServer.fd = serverSocket;
     pollFdServer.events = POLLIN;
     pollFdServer.revents = 0;
-    fds.push_back(pollFdServer);
+    vector_fds.push_back(pollFdServer);
 
     while(1){
-        int activity = poll(fds.data(), fds.size(), -1); //-1 se reveille uniquement si un evenement se passe
+        //std::cout << "Welcome to Max IRC SERVER" << std::endl;
+        int activity = poll(vector_fds.data(), vector_fds.size(), -1); //-1 se reveille uniquement si un evenement se passe
         if (activity < 0){
             std::cout << "Poll error" << std::endl;
             break;
         }
-        if (pollFdServer.revents){
-            struct pollfd newClient; //structure d'observation d'evenement ainsi que son fd
-            newClient.events = ;
-            newClient.fd = accept(serverSocket, (struct sockaddr*)&);
+        
+        for (size_t i = 0; i < vector_fds.size(); i++){
+            if (vector_fds[i].revents & POLLIN){  // On utilise '&' (ET binaire) car revents contient une combinaison de flags (bits), (revents & POLLIN) renvoie VRAI si le bit POLLIN est activé, indépendamment des autres bits.
+                if (vector_fds[i].fd == serverSocket){ // si cest le serveur: nouvelle connextion
+                    struct sockaddr_in client;
+                    socklen_t client_len = sizeof(client);
+        
+                    int fd_client = accept(serverSocket, (struct sockaddr*)&client, &client_len);
+                    if (fd_client >= 0)
+                        std::cout << "New client connected" << fd_client << std::endl;
+                        
+                    struct pollfd newClient; //structure d'observation d'evenement ainsi que son fd
+                    newClient.fd = fd_client;
+                    newClient.events = POLLIN; 
+                    newClient.revents = 0;
+                    vector_fds.push_back(newClient);                    
+                } 
+            }
+            else{ // message recu d'un client
+                char buffer[512];
+                int taille = recv(vector_fds[i].fd, buffer, sizeof(buffer) -1, 0);
+                
+                if (taille <= 0){ //erreur ou deconnextion
+                    std::cout << "Deconnexion client: " << vector_fds[i].fd << std::endl;
+                    close(vector_fds[i].fd);
+                    vector_fds.erase(vector_fds.begin() + i);
+                    i-- ; //recommence avec le meme i 
+                }
+                else{ //message recu
+                    buffer[taille] = '\0';
+                    std::cout << "Message de " << vector_fds[i].fd << ": " << buffer << std::endl;
+                }
+            }
+            
         }
     }
 
-    for (int i = 0; i < fds.size(); i++){
-        close(fds[i].fd);
+    for (size_t i = 0; i < vector_fds.size(); i++){
+        close(vector_fds[i].fd);
     }
 }
 
