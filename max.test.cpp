@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   max.test.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
+/*   By: max <max@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/02 08:44:29 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/02 15:11:46 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/03 17:53:18 by max              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,14 @@ int main(int argc, char **argv){
                         close(fds[i].fd);
                         fds.erase(fds.begin() + i);
                         i--;
-                    } else {
+                    } 
+                    else {
                         buffer[taille] = '\0';
                         std::cout << "Message de " << fds[i].fd << ": " << buffer << std::endl;
                     }         
                 }
             }
         }
-        //close(client_fd);
     }
     for (size_t i = 0; i < fds.size(); i++)
         close(fds[i].fd);
