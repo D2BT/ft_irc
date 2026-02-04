@@ -6,7 +6,7 @@
 /*   By: max <max@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/03 20:35:17 by max              ###   ########.fr       */
+/*   Updated: 2026/02/04 18:11:42 by max              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,21 @@ int main(int argc, char **argv){
     pollFdServer.events = POLLIN;
     pollFdServer.revents = 0;
     vector_fds.push_back(pollFdServer);
-
+    
+    // CREATION BOT:
+    struct sockaddr_in BOT;
+    socklen_t BOT_len = sizeof(BOT);
+    
+    int fd_bot = accept(serverSocket, (struct sockaddr*)&BOT, &BOT_len);
+    if (fd_bot >= 0){
+        std::cout << "BOT connected, fd: " << fd_BOT << std::endl;
+        
+        struct pollfd BOT; //structure d'observation d'evenement ainsi que son fd
+        BOT.fd = fd_client;
+        BOT.events = POLLIN; 
+        BOT.revents = 0;
+        vector_fds.push_back(BOT);
+    }
     while(1){
         //std::cout << "Welcome to Max IRC SERVER" << std::endl;
         int activity = poll(vector_fds.data(), vector_fds.size(), -1); //-1 se reveille uniquement si un evenement se passe
@@ -62,7 +76,7 @@ int main(int argc, char **argv){
         
                     int fd_client = accept(serverSocket, (struct sockaddr*)&client, &client_len);
 					if (fd_client >= 0){
-						std::cout << "New client connected" << fd_client << std::endl;
+						std::cout << "New client connected, fd: " << fd_client << std::endl;
 						
 						struct pollfd newClient; //structure d'observation d'evenement ainsi que son fd
 						newClient.fd = fd_client;
@@ -84,6 +98,7 @@ int main(int argc, char **argv){
 					else{ //message recu
 						buffer[taille] = '\0';
 						std::cout << "Message de " << vector_fds[i].fd << ": " << buffer << std::endl;
+                        bot.analyse((std::string)buffer);
 					}
 				}
 			}
