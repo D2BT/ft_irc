@@ -16,14 +16,15 @@
 #include <exception>
 #include <sstream>
 #include <fcntl.h>
+#include "ICmd.hpp"
 
 class Server{
 	private:
 		int _port; // Port d'écoute du serveur IRC
 		int _listenfd; // File descriptor de la socket d'écoute (serveur)
 		std::string _password; // Mot de passe requis pour se connecter au serveur
-		std::map<int, Client> _clients; // Liste des clients connectés (clé = fd)
-		std::map<std::string, ICommand*> _commands; // Commandes IRC disponibles (NICK, USER, JOIN, ...)
+		std::map<int, Client> _clients; // Liste des clients connectés (clé/int = fd)
+		std::map<std::string, ICmd*> _commands; // Commandes IRC disponibles (NICK, USER, JOIN, ...)
 		std::vector<pollfd> _pfds; // Liste des sockets surveillées par poll()
 
 		// Traite une commande reçue d'un client

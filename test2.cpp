@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test2.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: max <max@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/04 18:11:42 by max              ###   ########.fr       */
+/*   Updated: 2026/02/05 11:36:32 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <poll.h>
 #include <vector>
+#include <map>
+#include "./srcs/Client.cpp"
 
 #define MAX_CLIENT 500
 
@@ -25,6 +27,8 @@ int main(int argc, char **argv){
         return(std::cout << "Usage: /ircserv <port> <password>" << std::endl, 1);
     int port = atoi(argv[1]);
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    
+    std::map<int, Client> clients;
     
     sockaddr_in serverAdress; //structure de configuration reseau
     serverAdress.sin_family = AF_INET;
@@ -52,13 +56,14 @@ int main(int argc, char **argv){
     
     int fd_bot = accept(serverSocket, (struct sockaddr*)&BOT, &BOT_len);
     if (fd_bot >= 0){
-        std::cout << "BOT connected, fd: " << fd_BOT << std::endl;
+        std::cout << "BOT connected, fd: " << fd_bot << std::endl;
         
         struct pollfd BOT; //structure d'observation d'evenement ainsi que son fd
-        BOT.fd = fd_client;
+        BOT.fd = fd_bot;
         BOT.events = POLLIN; 
         BOT.revents = 0;
         vector_fds.push_back(BOT);
+        clients.insert({fd_bot, Client(fd_bot)});
     }
     while(1){
         //std::cout << "Welcome to Max IRC SERVER" << std::endl;
