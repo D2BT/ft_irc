@@ -37,7 +37,7 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _pas
 // Libère la mémoire des commandes et des clients, ferme les sockets
 Server::~Server(){
 	// Libère les commandes IRC
-	std::map<std::string, ICommand*>::iterator ite = _commands.begin();
+	std::map<std::string, ICmd*>::iterator ite = _commands.begin();
 	for (; ite != _commands.end(); ++ite)
 		delete ite->second;
 	_commands.clear();
