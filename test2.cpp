@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/05 11:36:32 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/06 19:15:30 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 #include <poll.h>
 #include <vector>
 #include <map>
-#include "./srcs/Client.cpp"
+#include "Bot.hpp"
+#include "./includes/Client.hpp"
 
 #define MAX_CLIENT 500
 
@@ -41,41 +42,46 @@ int main(int argc, char **argv){
     if (listen(serverSocket, MAX_CLIENT) == -1)
         return(std::cout << "Listen error" << std::endl, 1);
 
-    std::vector<struct pollfd> vector_fds;
+    std::vector<struct pollfd> vector_PollFds;
     
     struct pollfd pollFdServer;
     
     pollFdServer.fd = serverSocket;
     pollFdServer.events = POLLIN;
     pollFdServer.revents = 0;
-    vector_fds.push_back(pollFdServer);
+    vector_PollFds.push_back(pollFdServer);
     
     // CREATION BOT:
-    struct sockaddr_in BOT;
-    socklen_t BOT_len = sizeof(BOT);
+    struct sockaddr_in botAddr;
+    socklen_t BOT_len = sizeof(botAddr);
     
-    int fd_bot = accept(serverSocket, (struct sockaddr*)&BOT, &BOT_len);
+    int fd_bot = accept(serverSocket, (struct sockaddr*)&botAddr, &BOT_len);
     if (fd_bot >= 0){
         std::cout << "BOT connected, fd: " << fd_bot << std::endl;
         
-        struct pollfd BOT; //structure d'observation d'evenement ainsi que son fd
-        BOT.fd = fd_bot;
-        BOT.events = POLLIN; 
-        BOT.revents = 0;
-        vector_fds.push_back(BOT);
+        struct pollfd botPollfd; //structure d'observation d'evenement ainsi que son fd
+        botPollfd.fd = fd_bot;
+        botPollfd.events = POLLIN; 
+        botPollfd.revents = 0;
+        vector_PollFds.push_back(botPollfd);
         clients.insert({fd_bot, Client(fd_bot)});
+
+        
     }
+    else
+        std::cout << "botPollfd error" << std::endl;
+    Bot iRoBot(fd_bot);
     while(1){
         //std::cout << "Welcome to Max IRC SERVER" << std::endl;
-        int activity = poll(vector_fds.data(), vector_fds.size(), -1); //-1 se reveille uniquement si un evenement se passe
+        int activity = poll(vector_PollFds.data(), vector_PollFds.size(), -1); //-1 se reveille uniquement si un evenement se passe
         if (activity < 0){
             std::cout << "Poll error" << std::endl;
             break;
         }
         
-        for (size_t i = 0; i < vector_fds.size(); i++){
-            if (vector_fds[i].revents & POLLIN){  // On utilise '&' (ET binaire) car revents contient une combinaison de flags (bits), (revents & POLLIN) renvoie VRAI si le bit POLLIN est activé, indépendamment des autres bits.
-                if (vector_fds[i].fd == serverSocket){ // si cest le serveur: nouvelle connextion
+        for (size_t i = 0; i < vector_PollFds.size(); i++){
+            if (vector_PollFds[i].revents & POLLIN){  // On utilise '&' (ET binaire) car revents contient une combinaison de flags (bits), (revents & POLLIN) renvoie VRAI si le bit POLLIN est activé, indépendamment des autres bits.
+                if (vector_PollFds[i].fd == serverSocket){ // si cest le serveur: nouvelle connextion
                     struct sockaddr_in client;
                     socklen_t client_len = sizeof(client);
         
@@ -87,34 +93,48 @@ int main(int argc, char **argv){
 						newClient.fd = fd_client;
 						newClient.events = POLLIN; 
 						newClient.revents = 0;
-						vector_fds.push_back(newClient);
+						vector_PollFds.push_back(newClient);
 					}
                 }
                 else { // message recu d'un client
 					char buffer[512];
-					int taille = recv(vector_fds[i].fd, buffer, sizeof(buffer) -1, 0);
+					int taille = recv(vector_PollFds[i].fd, buffer, sizeof(buffer) -1, 0);
 					
 					if (taille <= 0){ //erreur ou deconnextion
-						std::cout << "Deconnexion client: " << vector_fds[i].fd << std::endl;
-						close(vector_fds[i].fd);
-						vector_fds.erase(vector_fds.begin() + i);
+						std::cout << "Deconnexion client: " << vector_PollFds[i].fd << std::endl;
+						close(vector_PollFds[i].fd);
+						vector_PollFds.erase(vector_PollFds.begin() + i);
 						i-- ; //recommence avec le meme i 
 					}
 					else{ //message recu
 						buffer[taille] = '\0';
-						std::cout << "Message de " << vector_fds[i].fd << ": " << buffer << std::endl;
-                        bot.analyse((std::string)buffer);
+						std::cout << "Message de " << vector_PollFds[i].fd << ": " << buffer << std::endl;
+                        iRoBot.analyse((std::string)buffer);
 					}
 				}
 			}
         }
     }
 
-	for (size_t i = 0; i < vector_fds.size(); i++){
-		close(vector_fds[i].fd);
+	for (size_t i = 0; i < vector_PollFds.size(); i++){
+		close(vector_PollFds[i].fd);
 	}
 }
+//  donc actuellemtn jaccept mon fd bot alors que je devrais dabord socket et connect ?
 
+// EXACTEMENT ! Vous avez tout compris.
+
+// Actuellement vous faites :
+// accept (J'attends que quelqu'un vienne) -> Le serveur se met en pause et attend... attend...
+
+// Ce que vous devez faire :
+
+// socket (Le bot achète un téléphone).
+// connect (Le bot lance l'appel).
+// Et ensuite seulement, le serveur verra arriver cet appel dans son poll et fera accept.
+// Je corrige test2.cpp immédiatement pour respecter cet ordre.
+
+// Attention : je dois aussi m'assurer que votre Bot.hpp est compatible avec ce qu'on va écrire (qu'il a bien une méthode auth ou similaire). Je vais jeter un œil rapide avant.
 
 // creation socket
 // bind

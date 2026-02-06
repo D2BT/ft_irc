@@ -36,6 +36,8 @@ class Server{
 		// Déconnecte proprement un client
 		void disconnectClient(int fd);
 
+		/!\ liste de channel accesible _name;
+
 	public:
 		// Constructeur : initialise le serveur avec port et mot de passe
 		Server(int port, std::string password);
