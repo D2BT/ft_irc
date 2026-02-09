@@ -2,6 +2,7 @@
 
 #include "../includes/Client.hpp"
 #include "../includes/ICmd.hpp"
+#include "../includes/Channel.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -26,13 +27,14 @@ class Server{
 		std::string _password;
 		std::map<int, Client> _clients;
 		std::map<std::string, ICmd*> _commands;
+		std::map<std::string, Channel *> _channels;
 		std::vector<pollfd> _pfds;
 
 		int  acceptNewClient();
 		void receiveFromClient(int fd);
 		bool handleCommand(Client &client, std::string &line);
 		
-		public:
+	public:
 		Server(int port, std::string password);
 		~Server();
 		
@@ -45,6 +47,11 @@ class Server{
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
+
+		Channel *createChannel(std::string channelName);
+		Channel *getChannel(std::string const &channelName) const;
+
+		std::map<std::string, Channel *> getChannels() const;
 
 		void setup();
 		void run();
