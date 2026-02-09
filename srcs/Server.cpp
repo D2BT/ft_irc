@@ -287,6 +287,25 @@ void Server::run(){
 	}
 }
 
+void sendToClient(Client& client, const std::string& message){
+    std::string fullMessage = message + "\r\n";
+
+    size_t total = 0;
+    while (total < fullMessage.size()) {
+        ssize_t bytes = send(client.getFd(), fullMessage.c_str() + total, fullMessage.size() - total, 0);
+        if (bytes < 0) {
+			std::ostringstream msg;
+			msg << "Erreur: impossible d'envoyer des données au client (fd: " << client.getFd() << ").";
+			Logger::log(DEBUG, msg.str());
+            break;
+        }
+        total += bytes;
+    }
+    std::ostringstream msg;
+    msg << "S--> [" << client.getNickname() << "] " << message;
+    Logger::log(DEBUG, msg.str());
+}
+
 Channel *Server::getChannel(std::string const &channelName) const {
 	std::map<std::string, Channel *>::const_iterator it = _channels.find(channelName);
 	if (it == _channels.end())

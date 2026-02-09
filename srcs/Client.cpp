@@ -46,11 +46,11 @@ const std::string& Client::getRealname() const{
 	return this->_realname;
 }
 
-bool Client::getRegistered() const{
+bool Client::isRegistered() const{
 	return this->_isRegistered;
 }
 
-bool Client::getAuthenticated() const{
+bool Client::isAuthenticated() const{
 	return this->_isAuthenticated;
 }
 

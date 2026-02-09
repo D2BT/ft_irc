@@ -47,10 +47,10 @@ class Server{
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
-
+		
+		void sendToClient(Client& client, const std::string& message);
 		Channel *createChannel(std::string channelName);
 		Channel *getChannel(std::string const &channelName) const;
-
 		std::map<std::string, Channel *> getChannels() const;
 
 		void setup();

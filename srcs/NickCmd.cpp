@@ -49,11 +49,11 @@ void NickCmd::execute(Server& server, Client& client, const std::vector<std::str
 	}
 
 	std::string nickChangeMessage = ":" + oldNick + "!" + client.getUsername() + "@" + server.getServerName() + " NICK :" + newNick;
-	std::map<std::string, Channel>& channels = server.getChannels();
-    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it){
-        Channel& currentChannel = it->second;
-        if (currentChannel.isClientInChannel(client.getFd()))
-            currentChannel.broadcast(server, nickChangeMessage);
+	std::map<std::string, Channel *> channels = server.getChannels();
+    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it){
+        Channel* currentChannel = it->second;
+        if (currentChannel->isClientInChannel(client.getFd()))
+            currentChannel->broadcast(server, nickChangeMessage);
     }
 
 	server.sendToClient(client, nickChangeMessage);
