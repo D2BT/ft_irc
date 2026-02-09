@@ -22,21 +22,25 @@ class Server{
 	private:
 		int _port;
 		int _listenfd;
+		std::string _serverName;
 		std::string _password;
 		std::map<int, Client> _clients;
 		std::map<std::string, ICmd*> _commands;
 		std::vector<pollfd> _pfds;
 
-		bool handleCommand(Client &client, std::string &line);
 		int  acceptNewClient();
 		void receiveFromClient(int fd);
-		void disconnectClient(int fd);
-
-	public:
+		bool handleCommand(Client &client, std::string &line);
+		
+		public:
 		Server(int port, std::string password);
 		~Server();
-
+		
 		static volatile bool g_running;
+		static void signalHandler(int signum);
+		
+		void sendReply(const Client& client, const std::string& message);
+		void disconnectClient(int fd);
 
 		void setup();
 		void run();
