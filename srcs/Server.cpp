@@ -1,57 +1,72 @@
 #include "../includes/Server.hpp"
 #include "../includes/Exception.hpp"
 #include "../includes/Logger.hpp"
+#include "../includes/Client.hpp"
+#include "../includes/NickCmd.hpp"
+#include "../includes/UserCmd.hpp"
+#include "../includes/PassCmd.hpp"
+#include "../includes/PingCmd.hpp"
+#include "../includes/ModeCmd.hpp"
+#include "../includes/JoinCmd.hpp"
+#include "../includes/PartCmd.hpp"
+#include "../includes/PrivmsgCmd.hpp"
+#include "../includes/KickCmd.hpp"
+#include "../includes/QuitCmd.hpp"
+#include "../includes/TopicCmd.hpp"
+#include "../includes/InviteCmd.hpp"
+//#include "../includes/Channel.hpp"
 
-// Variable globale pour savoir si le serveur doit continuer à tourner
 volatile bool Server::g_running = true;
 
-// Constructeur du serveur IRC
-// Initialise le port, le mot de passe et les commandes IRC disponibles
-Server::Server(int port, std::string password): _port(port), _listenfd(-1), _password(password){
-	try {
-		// Création des objets pour chaque commande IRC prise en charge
-		_commands["NICK"] = new NickCommand();
-		_commands["USER"] = new UserCommand();
-		_commands["PASS"] = new PassCommand();
-		_commands["PING"] = new PingCommand();
-		_commands["MODE"] = new ModeCommand();
-		_commands["JOIN"] = new JoinCommand();
-		_commands["PRIVMSG"] = new PrivmsgCommand();
-		_commands["PART"] = new PartCommand();
-		_commands["KICK"] = new KickCommand();
-		_commands["QUIT"] = new QuitCommand();
-		_commands["TOPIC"] = new TopicCommand();
-		_commands["INVITE"] = new InviteCommand();
-	}
-	catch (std::bad_alloc & e) {
-		// Libère la mémoire en cas d'erreur d'allocation
-		for(std::map<std::string, ICommand*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
-			delete it->second;
-		}
-		_commands.clear();
-		throw;
-	}
+Server::Server(int port, std::string password): _port(port), _listenfd(-1), _serverName("my_irc_server"), _password(password){
+    /* try {
+        _commands["NICK"] = new NickCmd();
+        _commands["USER"] = new UserCmd();
+        _commands["PASS"] = new PassCmd();
+        _commands["PING"] = new PingCmd();
+        _commands["MODE"] = new ModeCmd();
+        _commands["JOIN"] = new JoinCmd();
+        _commands["PRIVMSG"] = new PrivmsgCmd();
+        _commands["PART"] = new PartCmd();
+        _commands["KICK"] = new KickCmd();
+        _commands["QUIT"] = new QuitCmd();
+        _commands["TOPIC"] = new TopicCmd();
+        _commands["INVITE"] = new InviteCmd();
+    }
+    catch (std::bad_alloc & e) {
+        for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
+            delete it->second;
+        }
+        _commands.clear();
+        throw;
+    } */
 }
 
 // Destructeur du serveur IRC
 // Libère la mémoire des commandes et des clients, ferme les sockets
 Server::~Server(){
-	// Libère les commandes IRC
 	std::map<std::string, ICmd*>::iterator ite = _commands.begin();
-	for (; ite != _commands.end(); ++ite)
-		delete ite->second;
-	_commands.clear();
+    for (; ite != _commands.end(); ++ite)
+        delete ite->second;
+    _commands.clear();
 
-	// Libère les clients connectés
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it){
-		close (it->first);
-		delete it->second;
-	}
-	_clients.clear();
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it){
+        close (it->first);
+    }
+    _clients.clear();
 
-	// Ferme la socket d'écoute si elle existe
-	if (_listenFd != -1)
-		close (_listenFd);
+    if (_listenfd != -1)
+        close (_listenfd);
+
+	// close le bot ici si il est actif
+}
+
+void Server::signalHandler(int signum){
+	(void)signum;
+    std::ostringstream msg;
+    msg << "Signal " << signum << " reçu. Arrêt du serveur...";
+    Logger::log(INFO, msg.str());
+    Server::g_running = false;
 }
 
 // Prépare le serveur à écouter les connexions entrantes
@@ -200,13 +215,66 @@ bool Server::handleCommand(Client &client, std::string &line){
 
 	if (line.empty()) {return false;}
 
+	std::istringstream iss(line);
+	std::string cmd;
+	iss >> cmd;
 
+	std::string rest;
+    std::getline(iss, rest);
+    rest = trimLeft(rest);
 
+	std::vector<std::string> args;
+	std::string token;
+	std::istringstream argStream(rest);
 
-	return true;
+	while (argStream >> token){
+		if (!token.empty() && token[0] == ':'){
+			std::string new_token = token.substr(1);
+			std::string tmp;
+			std::getline(argStream, tmp);
+			if (!tmp.empty())
+				new_token += tmp;
+			args.push_back(new_token);
+			break;
+		}
+		args.push_back(token);
+	}
+
+	for (size_t i = 0; i < cmd.size(); i++) {cmd[i] = std::toupper(cmd[i]);}
+
+	std::map<std::string, ICmd*>::iterator it = _commands.find(cmd);
+	if (it != _commands.end()){ // cas ou la commade est connu
+		// ajouter verif que le client existe 
+        it->second->execute(*this, client, args);
+	}
+	else { // Commande Inconnue !
+        std::ostringstream msg;
+        msg << "Commande inconnue '" << cmd << "' par '" << client.getNickname() << "'";
+        Logger::log(INFO, msg.str());
+        sendReply(client, "421 " + client.getNickname() + " " + cmd + " :Unknown command");
+	}
+	return false;
 }
 
-// Boucle principale du serveur : surveille toutes les sockets avec poll()
+void Server::sendReply(const Client& client, const std::string& message){
+	std::string fullMessage = ":" + _serverName + " " + message + "\r\n";
+
+	size_t total = 0;
+	while (total < fullMessage.size()){
+		ssize_t bytes = send(client.getFd(), fullMessage.c_str() + total, fullMessage.length() - total, 0);
+		if (bytes < 0){
+			std::ostringstream msg;
+			msg << "Erreur sur send() vers le client " << client.getNickname() << "(fd: " << client.getFd() << ")";
+			Logger::log(ERROR, msg.str());
+			break;
+		}
+		total += bytes;
+	}
+	std::ostringstream msg;
+	msg << "S--> [" << client.getNickname() << "]" << message;
+	Logger::log(DEBUG, msg.str());
+}
+
 void Server::run(){
 	// On prépare la structure pollfd pour la socket d'écoute (serveur)
 	pollfd p;

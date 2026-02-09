@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../includes/Client.hpp"
+#include "../includes/ICmd.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -20,32 +21,29 @@
 
 class Server{
 	private:
-		int _port; // Port d'écoute du serveur IRC
-		int _listenfd; // File descriptor de la socket d'écoute (serveur)
-		std::string _password; // Mot de passe requis pour se connecter au serveur
-		std::map<int, Client> _clients; // Liste des clients connectés (clé/int = fd)
-		std::map<std::string, ICmd*> _commands; // Commandes IRC disponibles (NICK, USER, JOIN, ...)
-		std::vector<pollfd> _pfds; // Liste des sockets surveillées par poll()
+		int _port;
+		int _listenfd;
+		std::string _serverName;
+		std::string _password;
+		std::map<int, Client> _clients;
+		std::map<std::string, ICmd*> _commands;
+		std::vector<pollfd> _pfds;
 
-		// Traite une commande reçue d'un client
-		bool handleCommand(Client &client, std::string &line);
-		// Accepte une nouvelle connexion client
 		int  acceptNewClient();
 		// Reçoit et traite les données envoyées par un client
 		void receiveFromClient(int fd);
-		// Déconnecte proprement un client
-		void disconnectClient(int fd);
-
-		/!\ liste de channel accesible _name;
-
-	public:
-		// Constructeur : initialise le serveur avec port et mot de passe
+		bool handleCommand(Client &client, std::string &line);
+		
+		public:
 		Server(int port, std::string password);
 		// Destructeur : libère les ressources
 		~Server();
-
-		// Variable globale pour arrêter proprement la boucle principale
+		
 		static volatile bool g_running;
+		static void signalHandler(int signum);
+		
+		void sendReply(const Client& client, const std::string& message);
+		void disconnectClient(int fd);
 
 		// Prépare le serveur à écouter les connexions
 		void setup();

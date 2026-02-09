@@ -39,6 +39,9 @@ int main(int argc, char **argv)
 		// Crée le serveur IRC avec le port et le mot de passe
 		Server server(port, password);
 
+		signal(SIGINT, Server::signalHandler);
+		signal(SIGTERM, Server::signalHandler);
+		
 		// Initialise le serveur (socket, options réseau, etc.)
 		server.setup();
 
