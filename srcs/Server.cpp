@@ -321,9 +321,9 @@ Channel *Server::getChannel(std::string const &channelName) const {
 	return it->second;
 }
 
-Channel *Server::createChannel(std::string channelName){
+Channel *Server::createChannel(std::string channelName, std::string password){
 	if (getChannel(channelName) == NULL){
-		Channel *newChannel = new Channel(channelName, "", "");
+		Channel *newChannel = new Channel(channelName, "", password);
 		_channels[channelName] = newChannel;
 		return newChannel;
 	}
