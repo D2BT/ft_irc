@@ -1,4 +1,5 @@
 #include "../includes/Channel.hpp"
+#include "../includes/Server.hpp"
 
 Channel::Channel() : _name("Default"), _topic("Default"), _password("Default") {}
 
@@ -75,6 +76,35 @@ void Channel::setChannelTopic(Client *user, std::string newTopic) {
         throw NotAdmin();
     }
     _topic = newTopic;
+}
+
+bool Channel::isInChannel(Client &user) const{
+    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); it++){
+        if (*it == &user)
+            return true;
+    }
+    return false;
+}
+
+
+
+void Channel::broadcastMessage(Server &server, std::string const &message){
+    for (size_t i = 0; i < _users.size(); i++)
+        server.sendToClient(*_users[i], message);
+}
+
+std::string const &Channel::getUserList() const {
+    std::string userList;
+    for (int i = 0; i < _users.size(); i++){
+        Client *current = _users[i];
+        std::vector<Client *>::const_iterator itAdmin = std::find(_admin.begin(), _admin.end(), current);
+        if (itAdmin != _admin.end())
+            userList += '@';
+        userList += current->getNickname();
+        if (i < _users.size() - 1)
+            userList += " ";
+    }
+    return userList;
 }
 
 const char *Channel::NotAdmin::what() const throw(){
