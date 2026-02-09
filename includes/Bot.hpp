@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 11:59:18 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/09 11:04:30 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:46:00 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,16 @@ class Bot{
 		std::string _username;
 		std::string _realname;
 		std::string _buffer;
+
+        std::vector<std::string> _kind;
+        std::vector<std::string> _angry;
         
         // bool _isRegistered;
         // bool _isAuthenticated;
         
     public:
         Bot();
-        Bot(int fd_bot);
+        //Bot(int fd_bot);
         ~Bot();
         
         int getFd() const;
@@ -44,7 +47,8 @@ class Bot{
         bool getRegistered() const;
 		bool getAuthenticated() const;
 
-        void setup();
+        void setup(int port, std::string password);
+        void setStr();
         void sendMessage();
         //void analyse(const std::string buffer);
 };
