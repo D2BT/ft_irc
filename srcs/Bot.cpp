@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/09 18:29:43 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/09 20:01:31 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void Bot::sendMessage(/*recuperer le nom du channel*/){
         kind++;
     }
     else{
-        std::cout << /*Client._nickname << */ _angry[angry % 8] << std::endl;
+        std::cout/* "PRIVMSG #channel" */ << /*Client._nickname << */ _angry[angry % 8] << std::endl;
         if (angry % 8 == 7)
             /*channel.kickByBot(_nickname)*/ std::cout << "KICK" << std::endl;
         angry++;
