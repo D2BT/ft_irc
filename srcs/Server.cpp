@@ -287,7 +287,7 @@ void Server::run(){
 	}
 }
 
-void sendToClient(Client& client, const std::string& message){
+void Server::sendToClient(Client& client, const std::string& message){
     std::string fullMessage = message + "\r\n";
 
     size_t total = 0;
