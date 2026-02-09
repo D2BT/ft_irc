@@ -52,7 +52,7 @@ class Server{
 		void notifyClientQuit(Client& client, const std::string& message);
 		
 		void sendToClient(Client& client, const std::string& message);
-		Channel *createChannel(std::string channelName);
+		Channel *createChannel(std::string channelName, std::string password = "");
 		Channel *getChannel(std::string const &channelName) const;
 		std::map<std::string, Channel *> getChannels() const;
 
