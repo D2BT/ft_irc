@@ -11,8 +11,9 @@ class Channel {
         std::string _name;
         std::string _topic;
         std::string _password;
-        bool        _invit_only;
-        unsigned int _limit;
+        bool        _invitOnly;
+        bool        _restrictedTopic;
+        int         _userLimit;
         std::vector<Client *> _admin;
         std::vector<Client *> _users;
         std::vector<Client *> _invits;
@@ -29,12 +30,21 @@ class Channel {
         void                addClient(Client *user);
         void                removeClient(Client *user);
 
-        std::string const &getChannelName() const;
-        std::string const &getChannelTopic() const;
-        std::string const &getPasswordChannel() const;
-        std::string const &getUserList() const;
+        std::string const  &getChannelName() const;
+        std::string const  &getChannelTopic() const;
+        std::string const  &getPasswordChannel() const;
+        std::string const  &getUserList() const;
 
-        bool               isInChannel(Client &user) const;
+        void                setModeInvite(bool val);
+        void                setModeTopic(bool val);
+        void                setUserLimit(int val);
+        void                setPassword(std::string password);
+
+        bool                getModeInvite() const;
+        bool                getModeTopic() const;
+        int                 getUserLimit() const;
+
+        bool                isInChannel(Client &user) const;
 
         void                setChannelTopic(Client *user, std::string topic);
 
