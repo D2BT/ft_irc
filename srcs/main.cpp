@@ -1,4 +1,5 @@
 #include <iostream>
+#include <csignal>
 #include "../includes/Exception.hpp"
 #include "../includes/Color.hpp"
 #include "../includes/Server.hpp"
