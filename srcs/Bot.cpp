@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/09 17:58:46 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/09 18:29:43 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void Bot::sendMessage(/*recuperer le nom du channel*/){
     static int kind = 0;
     static int angry = 0;
     //std::cout << "Ca fais 10s que personne n'a ecris... je me sens comme un bit isolee" << std::endl;
+    //for (/*all channelS, channel++ */){}
     if (/*all client of this channel are kind*/1 != 1){
         std::cout << _kind[kind % 6] << std::endl;
         kind++;
@@ -91,5 +92,4 @@ void Bot::setStr(){
     _angry.push_back("encore un mot et je fais `rm -rf /` sur ta session.");
     _angry.push_back("si l'intelligence était un bit, tu serais à 0.");
     _angry.push_back("aller tchao j'te kick. 5...4...3...2...1...");
-    
 }
