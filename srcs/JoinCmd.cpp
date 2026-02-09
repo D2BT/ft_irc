@@ -51,5 +51,5 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
     else
         server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + channelName + ": Topic is " + channel->getChannelTopic() + "\r\n");
     server.sendReply(client, ":" + server.getServerName() + " 353 " + client.getNickname() + " = " + channelName + " :" + channel->getUserList());
-    server.sendReply(client, ":" + server.getServerName() + " 366" + client.getNickname() + " " + channelName + " :End of /NAMES list");
+    server.sendReply(client, ":" + server.getServerName() + " 366 " + client.getNickname() + " " + channelName + " :End of /NAMES list");
 }
