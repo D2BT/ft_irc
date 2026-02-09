@@ -27,7 +27,7 @@ class Server{
 		int _listenfd;
 		std::string _serverName;
 		std::string _password;
-		std::map<int, Client> _clients;
+		std::map<int, Client *> _clients;
 		std::map<std::string, ICmd*> _commands;
 		std::map<std::string, Channel *> _channels;
 		std::vector<pollfd> _pfds;

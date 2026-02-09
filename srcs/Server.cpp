@@ -48,8 +48,9 @@ Server::~Server(){
         delete ite->second;
     _commands.clear();
 
-    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it){
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it){
         close (it->first);
+		delete it->second;
     }
     _clients.clear();
 
@@ -106,7 +107,13 @@ int  Server::acceptNewClient(){
 
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
-    _clients[client_fd] = Client(client_fd);
+	try {
+		_clients[client_fd] = new Client(client_fd);
+    }
+    catch (const std::bad_alloc& e) {
+        Logger::log(ERROR, "Impossible d'allouer le client - new error");
+        throw;
+    }
 
 	pollfd newFd;
 	newFd.fd = client_fd;
@@ -142,22 +149,31 @@ void Server::receiveFromClient(int fd){
 	}
 
 	buffer[bytes_read] = '\0';
-    Client &client = _clients[fd];
-	client.addToBuffer(std::string(buffer, bytes_read));
+    
+	std::map<int, Client*>::iterator it = _clients.find(fd);
+	if (it == _clients.end())
+    	return;
 
-	std::string& clientBuffer = client.getBuffer();
-    size_t pos;
+	Client* client = it->second;
+	client->addToBuffer(std::string(buffer, bytes_read));
+
+	std::string& clientBuffer = client->getBuffer();
+	size_t pos;
 
 	while ((pos = clientBuffer.find("\r\n")) != std::string::npos) {
 		std::string line = clientBuffer.substr(0, pos);
 		clientBuffer.erase(0, pos + 2);
-		handleCommand(client, line);
+		bool clientDisconnected = handleCommand(*client, line);
+        if (clientDisconnected) {
+            return;
+        }
 	}
 }
 
 void Server::disconnectClient(int fd){
-	std::map<int, Client>::iterator clientIt = _clients.find(fd);
+	std::map<int, Client*>::iterator clientIt = _clients.find(fd);
 	if (clientIt != _clients.end()){ //par la suite supprimer le client de tout les channels dans lequels il est 
+		delete clientIt->second;
 		_clients.erase(clientIt);
 	}
 
@@ -223,9 +239,24 @@ bool Server::handleCommand(Client &client, std::string &line){
 	for (size_t i = 0; i < cmd.size(); i++) {cmd[i] = std::toupper(cmd[i]);}
 
 	std::map<std::string, ICmd*>::iterator it = _commands.find(cmd);
-	if (it != _commands.end()){ // cas ou la commade est connu
-		// ajouter verif que le client existe 
+	if (it != _commands.end()){
+		std::ostringstream msg;
+        std::string nick;
+        if (client.getNickname().empty()){
+            std::ostringstream oss_nick;
+            oss_nick << "fd=" << client.getFd();
+            nick = oss_nick.str();
+        }
+        else
+            nick = client.getNickname();
+        msg << "Exécution de " << cmd << " par '" << nick << "'";
+        Logger::log(CMD, msg.str());
+
+		int clientFd = client.getFd();
         it->second->execute(*this, client, args);
+		if (_clients.find(clientFd) == _clients.end()) {
+            return true;
+        }
 	}
 	else { // Commande Inconnue !
         std::ostringstream msg;
@@ -256,9 +287,9 @@ void Server::sendReply(const Client& client, const std::string& message){
 }
 
 Client* Server::getClientByNick(const std::string& nick) {
-    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if (it->second.getNickname() == nick)
-            return &(it->second);
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second->getNickname() == nick)
+            return (it->second);
     }
     return nullptr;
 }
