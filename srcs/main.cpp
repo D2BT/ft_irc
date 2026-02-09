@@ -31,6 +31,10 @@ int main(int argc, char **argv)
 			throw ErrorPort();
 		std::string password = argv[2];
 		Server server(port, password);
+		
+		signal(SIGINT, Server::signalHandler);
+		signal(SIGTERM, Server::signalHandler);
+
 		server.setup(); 
 		server.run();
 	} catch (std::exception &e){
