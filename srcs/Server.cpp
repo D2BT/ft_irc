@@ -14,7 +14,7 @@
 #include "../includes/QuitCmd.hpp"
 #include "../includes/TopicCmd.hpp"
 #include "../includes/InviteCmd.hpp"
-//#include "../includes/Channel.hpp"
+#include "../includes/Channel.hpp"
 
 volatile bool Server::g_running = true;
 
@@ -53,6 +53,10 @@ Server::~Server(){
     }
     _clients.clear();
 
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++){
+		delete it->second;
+	}
+	_channels.clear();
     if (_listenfd != -1)
         close (_listenfd);
 
@@ -283,3 +287,23 @@ void Server::run(){
 	}
 }
 
+Channel *Server::getChannel(std::string const &channelName) const {
+	std::map<std::string, Channel *>::const_iterator it = _channels.find(channelName);
+	if (it == _channels.end())
+		return NULL;
+	return it->second;
+}
+
+Channel *Server::createChannel(std::string channelName){
+	if (getChannel(channelName) == NULL){
+		Channel *newChannel = new Channel(channelName, "", "");
+		_channels[channelName] = newChannel;
+		return newChannel;
+	}
+	return _channels[channelName];
+}
+
+
+std::map<std::string, Channel *> Server::getChannels() const {
+	return _channels;
+}
