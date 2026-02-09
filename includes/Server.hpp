@@ -38,6 +38,10 @@ class Server{
 		
 		static volatile bool g_running;
 		static void signalHandler(int signum);
+
+		Client* getClientByNick(const std::string& nick);
+        const std::string& getPassword() const;
+        const std::string& getServerName() const;
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
