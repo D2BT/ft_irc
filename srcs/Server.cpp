@@ -19,10 +19,10 @@
 volatile bool Server::g_running = true;
 
 Server::Server(int port, std::string password): _port(port), _listenfd(-1), _serverName("my_irc_server"), _password(password){
-    /* try {
+    try {
         _commands["NICK"] = new NickCmd();
         _commands["USER"] = new UserCmd();
-        _commands["PASS"] = new PassCmd();
+        /* _commands["PASS"] = new PassCmd();
         _commands["PING"] = new PingCmd();
         _commands["MODE"] = new ModeCmd();
         _commands["JOIN"] = new JoinCmd();
@@ -31,7 +31,7 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         _commands["KICK"] = new KickCmd();
         _commands["QUIT"] = new QuitCmd();
         _commands["TOPIC"] = new TopicCmd();
-        _commands["INVITE"] = new InviteCmd();
+        _commands["INVITE"] = new InviteCmd(); */
     }
     catch (std::bad_alloc & e) {
         for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
@@ -39,7 +39,7 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         }
         _commands.clear();
         throw;
-    } */
+    }
 }
 
 Server::~Server(){
@@ -247,6 +247,22 @@ void Server::sendReply(const Client& client, const std::string& message){
 	Logger::log(DEBUG, msg.str());
 }
 
+Client* Server::getClientByNick(const std::string& nick) {
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nick)
+            return &(it->second);
+    }
+    return nullptr;
+}
+
+const std::string& Server::getPassword() const{
+	return _password;
+}
+
+const std::string& Server::getServerName() const{
+	return _serverName;
+}
+
 void Server::run(){
 	pollfd p;
 	p.fd = _listenfd;
@@ -269,6 +285,25 @@ void Server::run(){
 			}
 		}
 	}
+}
+
+void Server::sendToClient(Client& client, const std::string& message){
+    std::string fullMessage = message + "\r\n";
+
+    size_t total = 0;
+    while (total < fullMessage.size()) {
+        ssize_t bytes = send(client.getFd(), fullMessage.c_str() + total, fullMessage.size() - total, 0);
+        if (bytes < 0) {
+			std::ostringstream msg;
+			msg << "Erreur: impossible d'envoyer des données au client (fd: " << client.getFd() << ").";
+			Logger::log(DEBUG, msg.str());
+            break;
+        }
+        total += bytes;
+    }
+    std::ostringstream msg;
+    msg << "S--> [" << client.getNickname() << "] " << message;
+    Logger::log(DEBUG, msg.str());
 }
 
 Channel *Server::getChannel(std::string const &channelName) const {

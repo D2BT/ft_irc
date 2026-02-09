@@ -40,13 +40,17 @@ class Server{
 		
 		static volatile bool g_running;
 		static void signalHandler(int signum);
+
+		Client* getClientByNick(const std::string& nick);
+        const std::string& getPassword() const;
+        const std::string& getServerName() const;
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
-
+		
+		void sendToClient(Client& client, const std::string& message);
 		Channel *createChannel(std::string channelName);
 		Channel *getChannel(std::string const &channelName) const;
-
 		std::map<std::string, Channel *> getChannels() const;
 
 		void setup();

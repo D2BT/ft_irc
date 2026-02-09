@@ -32,8 +32,13 @@ class Channel {
         std::string const &getChannelName() const;
         std::string const &getChannelTopic() const;
         std::string const &getPasswordChannel() const;
+        std::string const &getUserList() const;
+
+        bool               isInChannel(Client &user) const;
 
         void                setChannelTopic(Client *user, std::string topic);
+
+        void                broadcastMessage(Server &server, std::string const &message);
 
         class NotAdmin : public std::exception {
             public :

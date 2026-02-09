@@ -3,6 +3,7 @@
 #include "ICmd.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class JoinCmd: public ICmd{
     public:
