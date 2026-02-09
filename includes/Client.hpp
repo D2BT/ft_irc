@@ -28,8 +28,8 @@ class Client{
 		const std::string& getNickname() const;
 		const std::string& getUsername() const;
 		const std::string& getRealname() const;
-		bool getRegistered() const;
-		bool getAuthenticated() const;
+		bool isRegistered() const;
+		bool isAuthenticated() const;
 		std::string& getBuffer();
 
 		void addToBuffer(const std::string& data);
