@@ -11,8 +11,11 @@ class Channel {
         std::string _name;
         std::string _topic;
         std::string _password;
+        bool        _invit_only;
+        unsigned int _limit;
         std::vector<Client *> _admin;
         std::vector<Client *> _users;
+        std::vector<Client *> _invits;
 
         Channel();
         
