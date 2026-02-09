@@ -287,24 +287,25 @@ void Server::run(){
 	_pfds.push_back(p);       // On ajoute cette socket à la liste des sockets surveillées par poll()
 
 	//BOT
-	int fd_bot = acceptNewClient();
-	std::cout << "TEST:BOT connected, fd: " << fd_bot << std::endl;
-	Bot iRoBot(fd_bot);
+	// int fd_bot = acceptNewClient();
+	// std::cout << "TEST:BOT connected, fd: " << fd_bot << std::endl;
+	Bot iRoBot;
+	iRoBot.setup(this->_port, this->_password);
 
 	while(Server::g_running)
 	{
-		std::cout << "Recoit signal 1" << std::endl;
-		if (start - time(NULL) > 20){
+		//std::cout << "Recoit signal 1" << std::endl;
+		if ((time(NULL) - start) > 10){
 			iRoBot.sendMessage();
 			start = time(NULL);
 		}
 
 		// poll() surveille toutes les sockets (écoute + clients)
-		int activity = poll(&_pfds[0], _pfds.size(), 10000);
+		int activity = poll(&_pfds[0], _pfds.size(), 500);
 		if (activity < 0 && Server::g_running){
 			throw PollError();
 		}
-		std::cout << "Recoit signal 2" << std::endl;
+		//std::cout << "Recoit signal 2" << std::endl;
 
 		// Parcourt toutes les sockets surveillées
 		for (size_t i = 0; i < _pfds.size(); i++){
