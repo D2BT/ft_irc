@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 08:20:05 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/06 19:15:30 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/09 09:57:30 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv){
     Bot iRoBot(fd_bot);
     while(1){
         //std::cout << "Welcome to Max IRC SERVER" << std::endl;
-        int activity = poll(vector_PollFds.data(), vector_PollFds.size(), -1); //-1 se reveille uniquement si un evenement se passe
+        int activity = poll(vector_PollFds.data(), vector_PollFds.size(), 1000);
         if (activity < 0){
             std::cout << "Poll error" << std::endl;
             break;

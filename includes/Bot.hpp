@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 11:59:18 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/06 16:16:19 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:04:30 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <poll.h>
 #include <vector>
 #include <map>
+#include <ctime>
 #include "./../includes/Client.hpp"
 
 class Bot{
@@ -28,6 +29,7 @@ class Bot{
 		std::string _username;
 		std::string _realname;
 		std::string _buffer;
+        
         // bool _isRegistered;
         // bool _isAuthenticated;
         
@@ -37,11 +39,12 @@ class Bot{
         ~Bot();
         
         int getFd() const;
-        void setFd(int fd);
+        //void setFd(int fd);
 
         bool getRegistered() const;
 		bool getAuthenticated() const;
 
         void setup();
-        void analyse(const std::string buffer);
+        void sendMessage();
+        //void analyse(const std::string buffer);
 };
