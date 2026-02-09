@@ -93,9 +93,9 @@ void Channel::broadcastMessage(Server &server, std::string const &message){
         server.sendToClient(*_users[i], message);
 }
 
-std::string const &Channel::getUserList() const {
+std::string const Channel::getUserList() const {
     std::string userList;
-    for (int i = 0; i < _users.size(); i++){
+    for (size_t i = 0; i < _users.size(); i++){
         Client *current = _users[i];
         std::vector<Client *>::const_iterator itAdmin = std::find(_admin.begin(), _admin.end(), current);
         if (itAdmin != _admin.end())

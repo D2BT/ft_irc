@@ -11,6 +11,7 @@ class Client{
 		std::string _buffer;
         bool _isRegistered;
         bool _isAuthenticated;
+		bool _saidHello;
 
 	public:
 		Client();

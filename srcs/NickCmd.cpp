@@ -53,7 +53,7 @@ void NickCmd::execute(Server& server, Client& client, const std::vector<std::str
     for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it){
         Channel* currentChannel = it->second;
         if (currentChannel->isInChannel(client))
-            currentChannel->broadcast(server, nickChangeMessage);
+            currentChannel->broadcastMessage(server, nickChangeMessage);
     }
 
 	server.sendToClient(client, nickChangeMessage);
