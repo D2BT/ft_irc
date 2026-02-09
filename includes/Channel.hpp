@@ -5,14 +5,15 @@
 #include <vector>
 #include <algorithm>
 #include "../includes/Client.hpp"
+#include "../includes/Server.hpp"
 
 class Channel {
     private :
         std::string _name;
         std::string _topic;
         std::string _password;
-        bool        _invit_only;
-        unsigned int _limit;
+/*         bool        _invit_only;
+        unsigned int _limit; */
         std::vector<Client *> _admin;
         std::vector<Client *> _users;
         std::vector<Client *> _invits;
@@ -32,7 +33,7 @@ class Channel {
         std::string const &getChannelName() const;
         std::string const &getChannelTopic() const;
         std::string const &getPasswordChannel() const;
-        std::string const &getUserList() const;
+        std::string const getUserList() const;
 
         bool               isInChannel(Client &user) const;
 

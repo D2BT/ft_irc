@@ -9,9 +9,16 @@ OBJ_DIR = obj
 SRC =	srcs/main.cpp \
 		srcs/Exception.cpp \
 		srcs/Server.cpp \
+		srcs/Channel.cpp \
 		srcs/Client.cpp \
+		srcs/JoinCmd.cpp \
 		srcs/NickCmd.cpp \
-		srcs/UserCmd.cpp 
+		srcs/UserCmd.cpp \
+		srcs/PartCmd.cpp \
+		srcs/PassCmd.cpp \
+		srcs/PingCmd.cpp \
+		srcs/QuitCmd.cpp \
+
 
 OBJ = $(SRC:srcs/%.cpp=$(OBJ_DIR)/%.o)
 

@@ -1,5 +1,9 @@
 #include "../includes/JoinCmd.hpp"
 
+JoinCmd::JoinCmd(){}
+
+JoinCmd::~JoinCmd(){}
+
 void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> const &args) {
     if (args.empty())
         return;
@@ -19,5 +23,5 @@ void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> c
     else
         server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " #" + channelName + ": Topic is " + channel->getChannelTopic() + "\r\n");
     server.sendReply(client, ":" + server.getServerName() + " 353 " + client.getNickname() + "#" + channelName + " :" + channel->getUserList());
-    server.sendReply(client, ":" + server.getServerName() + " 366" + client.getNickname() + " #" + channelName + " :End of /NAMES list")  
+    server.sendReply(client, ":" + server.getServerName() + " 366 " + client.getNickname() + " #" + channelName + " :End of /NAMES list");
 }

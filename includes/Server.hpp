@@ -19,6 +19,8 @@
 #include <sstream>
 #include <fcntl.h>
 
+class Channel;
+
 class Server{
 	private:
 		int _port;
@@ -47,6 +49,7 @@ class Server{
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
+		void notifyClientQuit(Client& client, const std::string& message);
 		
 		void sendToClient(Client& client, const std::string& message);
 		Channel *createChannel(std::string channelName);

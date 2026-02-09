@@ -2,7 +2,7 @@
 
 Client::Client(){}
 
-Client::Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _isRegistered(false), _isAuthenticated(false){}
+Client::Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _isRegistered(false), _isAuthenticated(false), _saidHello(false){}
 
 Client::~Client(){}
 

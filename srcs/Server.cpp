@@ -22,15 +22,15 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
     try {
         _commands["NICK"] = new NickCmd();
         _commands["USER"] = new UserCmd();
-        /* _commands["PASS"] = new PassCmd();
+        _commands["PASS"] = new PassCmd();
         _commands["PING"] = new PingCmd();
-        _commands["MODE"] = new ModeCmd();
+        /*_commands["MODE"] = new ModeCmd();*/
         _commands["JOIN"] = new JoinCmd();
-        _commands["PRIVMSG"] = new PrivmsgCmd();
+       /* _commands["PRIVMSG"] = new PrivmsgCmd();*/
         _commands["PART"] = new PartCmd();
-        _commands["KICK"] = new KickCmd();
+        /*_commands["KICK"] = new KickCmd();*/
         _commands["QUIT"] = new QuitCmd();
-        _commands["TOPIC"] = new TopicCmd();
+        /*_commands["TOPIC"] = new TopicCmd();
         _commands["INVITE"] = new InviteCmd(); */
     }
     catch (std::bad_alloc & e) {
@@ -173,6 +173,14 @@ void Server::disconnectClient(int fd){
 	std::ostringstream msg;
     msg << "Client (fd=" << fd << ") déconnecté.";
     Logger::log(INFO, msg.str());
+}
+
+void Server::notifyClientQuit(Client& client, const std::string& message){
+    for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
+        if (it->second->isInChannel(client)){
+            it->second->broadcastMessage(*this, message);
+        }
+    }
 }
 
 static std::string& trimLeft(std::string& s){
