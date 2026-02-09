@@ -14,6 +14,7 @@
 #include "../includes/QuitCmd.hpp"
 #include "../includes/TopicCmd.hpp"
 #include "../includes/InviteCmd.hpp"
+#include "../includes/Bot.hpp"
 //#include "../includes/Channel.hpp"
 
 volatile bool Server::g_running = true;
@@ -276,6 +277,8 @@ void Server::sendReply(const Client& client, const std::string& message){
 }
 
 void Server::run(){
+	time_t start = time(NULL);
+
 	// On prépare la structure pollfd pour la socket d'écoute (serveur)
 	pollfd p;
 	p.fd = _listenfd;         // Le file descriptor de la socket d'écoute
@@ -283,13 +286,25 @@ void Server::run(){
 	p.revents = 0;            // Champ réservé pour les événements détectés par poll (initialisé à 0)
 	_pfds.push_back(p);       // On ajoute cette socket à la liste des sockets surveillées par poll()
 
+	//BOT
+	int fd_bot = acceptNewClient();
+	std::cout << "TEST:BOT connected, fd: " << fd_bot << std::endl;
+	Bot iRoBot(fd_bot);
+
 	while(Server::g_running)
 	{
+		std::cout << "Recoit signal 1" << std::endl;
+		if (start - time(NULL) > 20){
+			iRoBot.sendMessage();
+			start = time(NULL);
+		}
+
 		// poll() surveille toutes les sockets (écoute + clients)
-		int activity = poll(&_pfds[0], _pfds.size(), 1000);
+		int activity = poll(&_pfds[0], _pfds.size(), 10000);
 		if (activity < 0 && Server::g_running){
 			throw PollError();
 		}
+		std::cout << "Recoit signal 2" << std::endl;
 
 		// Parcourt toutes les sockets surveillées
 		for (size_t i = 0; i < _pfds.size(); i++){
@@ -299,8 +314,11 @@ void Server::run(){
 				if(_pfds[i].fd == _listenfd)
 					acceptNewClient();
 				// Sinon : données d'un client existant
-				else
+				else{
+					start = time(NULL);													//TIME
+					std::cout << "Recoit signal 3" << " time: " << start << std::endl;
 					receiveFromClient(_pfds[i].fd);
+				}
 			}
 		}
 	}
