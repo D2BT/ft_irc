@@ -1,9 +1,9 @@
 #include "../includes/Channel.hpp"
 #include "../includes/Server.hpp"
 
-Channel::Channel() : _name("Default"), _topic("Default"), _password("Default") {}
+Channel::Channel() : _name("Default"), _topic("Default"), _password(""), _userLimit(0), _invitOnly(false), _restrictedTopic(true) {}
 
-Channel::Channel(std::string name, std::string topic, std::string password) : _name(name), _topic(topic), _password(password) {}
+Channel::Channel(std::string name, std::string topic, std::string password) : _name(name), _topic(topic), _password(password), _userLimit(0), _invitOnly(false), _restrictedTopic(true) {}
 
 Channel::Channel(Channel const &src){
     _name = src._name;
@@ -11,6 +11,10 @@ Channel::Channel(Channel const &src){
     _password = src._password;
     _users = src._users;
     _admin = src._admin;
+    _invitOnly = src._invitOnly;
+    _invits = src._invits;
+    _restrictedTopic = src._restrictedTopic;
+    _userLimit = src._userLimit;
 }
 
 Channel &Channel::operator=(Channel const &rhs){
@@ -20,6 +24,10 @@ Channel &Channel::operator=(Channel const &rhs){
         _password = rhs._password;
         _users = rhs._users;
         _admin = rhs._admin;
+        _invitOnly = rhs._invitOnly;
+        _invits = rhs._invits;
+        _userLimit = rhs._userLimit;
+        _restrictedTopic = rhs._restrictedTopic;
     }
     return *this;
 }
@@ -84,6 +92,34 @@ bool Channel::isInChannel(Client &user) const{
             return true;
     }
     return false;
+}
+
+bool Channel::getModeInvite() const {
+    return _invitOnly;
+}
+
+bool Channel::getModeTopic() const {
+    return _restrictedTopic;
+}
+
+int Channel::getUserLimit() const {
+    return _userLimit;
+}
+
+void Channel::setModeInvite(bool val) {
+    _invitOnly = val;
+}
+
+void Channel::setModeTopic(bool val) {
+    _restrictedTopic = val;
+}
+
+void Channel::setUserLimit(int max) {
+    _userLimit = max;
+}
+
+void Channel::setPassword(std::string password) {
+    _password = password;
 }
 
 
