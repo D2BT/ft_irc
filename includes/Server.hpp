@@ -58,6 +58,7 @@ class Server{
 		Channel *createChannel(std::string channelName, std::string password = "");
 		Channel *getChannel(std::string const &channelName) const;
 		std::map<std::string, Channel *> getChannels() const;
+		std::map<int, Client *> getClients() const;
 
 		// Prépare le serveur à écouter les connexions
 		void setup();
