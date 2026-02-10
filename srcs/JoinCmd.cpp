@@ -47,7 +47,7 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
             server.sendReply(client, ":" + server.getServerName() + " 471 " + client.getNickname() + " " + channelName + " ::Cannot join channel (+l)");
             return;
         }
-        if (channel->getModeInvite() && !channel->isInvited(client)){
+        if (channel->getModeInvite() && !channel->isInvited(&client)){
             server.sendReply(client, ":" + server.getServerName() + " 473 " + client.getNickname() + " " + channelName + " ::Cannot join channel (+i)");
             return;
         }
