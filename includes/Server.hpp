@@ -61,6 +61,8 @@ class Server{
 		std::map<std::string, Channel *> getChannels() const;
 		std::map<int, Client *> getClients() const;
 
+		void sendToAllClient(const std::string& message);
+
 		// Prépare le serveur à écouter les connexions
 		void setup();
 		// Boucle principale : gère les connexions et les messages

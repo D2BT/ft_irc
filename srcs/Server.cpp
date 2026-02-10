@@ -385,7 +385,6 @@ void Server::run(){
 					acceptNewClient();
 				// Sinon : données d'un client existant
 				else{
-					start = time(NULL);
 					receiveFromClient(_pfds[i].fd);
 				}
 			}
@@ -436,3 +435,12 @@ std::map<std::string, Channel *> Server::getChannels() const {
 std::map<int, Client *> Server::getClients() const{
 	return _clients;
 }
+
+void Server::sendToAllClient(const std::string& message){
+	std::map<int, Client *>::iterator clientBegin = _clients.begin();
+	std::map<int, Client *>::iterator clientEnd = _clients.end();
+
+	for (;clientBegin != clientEnd; clientBegin++){
+		sendToClient(*clientBegin->second, message);
+	}
+};

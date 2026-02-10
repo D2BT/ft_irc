@@ -16,7 +16,7 @@ static bool isValidPort(const std::string &s, int &port)
 	long val = 0;
 	for (size_t j = 0; j < s.size(); j++)
 		val = val * 10 + (s[j] - '0');
-	if (val < 1 || val > 65535)
+	if (val < 1024 || val > 65535)
 		return false;
 	port = static_cast<int>(val);
 	return true;
