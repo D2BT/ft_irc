@@ -173,6 +173,10 @@ std::string const Channel::getUserList() const {
     return userList;
 }
 
+std::vector<Client *> Channel::getUsers() const{
+    return _users;
+}
+
 const char *Channel::NotAdmin::what() const throw(){
     return "Not a Channel Operator.";
 }

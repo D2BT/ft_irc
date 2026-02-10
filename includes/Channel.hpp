@@ -35,6 +35,7 @@ class Channel {
         std::string const &getChannelTopic() const;
         std::string const &getPasswordChannel() const;
         std::string const getUserList() const;
+        std::vector<Client *> getUsers() const;
         int               getNumberOfUsers() const;
 
         void                setModeInvite(bool val);
