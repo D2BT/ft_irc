@@ -12,11 +12,13 @@ SRC =	srcs/main.cpp \
 		srcs/Channel.cpp \
 		srcs/Client.cpp \
 		srcs/JoinCmd.cpp \
+		srcs/KickCmd.cpp \
 		srcs/NickCmd.cpp \
 		srcs/UserCmd.cpp \
 		srcs/PartCmd.cpp \
 		srcs/PassCmd.cpp \
 		srcs/PingCmd.cpp \
+		srcs/PrivmsgCmd.cpp \
 		srcs/QuitCmd.cpp \
 
 

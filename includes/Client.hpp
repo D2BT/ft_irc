@@ -35,6 +35,7 @@ class Client{
 		std::string& getBuffer();
 		void addOneChannel();
 		void removeOneChannel();
+		void saidHello();
 
 		void addToBuffer(const std::string& data);
 };

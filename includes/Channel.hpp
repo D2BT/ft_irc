@@ -45,11 +45,14 @@ class Channel {
         bool                getModeTopic() const;
         int                 getUserLimit() const;
 
-        bool                isInChannel(Client &user) const;
+        std::vector<Client *> getAdmin() const;
+
+        bool                isInChannel(Client *user) const;
 
         void                setChannelTopic(Client *user, std::string topic);
 
         void                broadcastMessage(Server &server, std::string const &message);
+        void                broadcastToOther(Server &server, std::string const &message, Client &client);
 
         class NotAdmin : public std::exception {
             public :
