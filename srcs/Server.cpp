@@ -291,7 +291,7 @@ Client* Server::getClientByNick(const std::string& nick) {
         if (it->second->getNickname() == nick)
             return (it->second);
     }
-    return nullptr;
+    return NULL;
 }
 
 const std::string& Server::getPassword() const{
