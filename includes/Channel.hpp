@@ -35,6 +35,7 @@ class Channel {
         std::string const &getChannelTopic() const;
         std::string const &getPasswordChannel() const;
         std::string const getUserList() const;
+        int               getNumberOfUsers() const;
 
         void                setModeInvite(bool val);
         void                setModeTopic(bool val);
@@ -48,6 +49,8 @@ class Channel {
         std::vector<Client *> getAdmin() const;
 
         bool                isInChannel(Client *user) const;
+        bool                isInvited(Client &user) const;
+        bool                isOperator(Client *user) const;
 
         void                setChannelTopic(Client *user, std::string topic);
 
