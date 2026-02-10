@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 16:48:04 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 16:58:51 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void Bot::setStr(){
     _angry.push_back(" error 404 : Politesse not found.");
     _angry.push_back(" connais-tu la politesse ?!");
     _angry.push_back(" on ne s'est pas bien compris je crois !!");
-    _angry.push_back(" tu connais Vald ? Ben dis bonjour sinon...!!");
+    _angry.push_back(" tu connais Vald ? Ben dis bonjour sinon on va te niquer ta carte mere !!");
     _angry.push_back(" attention, je vais te segfault au visage.");
     _angry.push_back(" encore un mot et je fais `rm -rf /` sur ta session.");
     _angry.push_back(" si l'intelligence était un bit, tu serais à 0.");
