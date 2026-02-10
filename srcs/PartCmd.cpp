@@ -6,12 +6,12 @@ PartCmd::~PartCmd(){}
 
 void PartCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
 	if (!client.isRegistered()){
-		server.sendReply(client, "451 " + client.getNickname() + " :You have not register");
+		server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not register");
 		return;
 	}
 	
 	if (args.empty()){
-		server.sendReply(client, "461 " + client.getNickname() + " :Not enough parameters");
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " :Not enough parameters");
 		return;
 	}
 
@@ -38,12 +38,12 @@ void PartCmd::execute(Server& server, Client& client, const std::vector<std::str
 		Channel* channel = server.getChannel(channelsToLeave[i]);
 
 		if (channel == NULL){
-			server.sendReply(client, "403 " + client.getNickname() + " " + channelsToLeave[i] + " :No such channel");
+			server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + channelsToLeave[i] + " :No such channel");
 			continue;
 		}
 
 		if (!channel->isInChannel(&client)){
-			server.sendReply(client, "442 " + client.getNickname() + " " + channelsToLeave[i]+ " :You're not on that channel");
+			server.sendReply(client, ":" + server.getServerName() + " 442 " + client.getNickname() + " " + channelsToLeave[i]+ " :You're not on that channel");
 			continue;
 		}
 

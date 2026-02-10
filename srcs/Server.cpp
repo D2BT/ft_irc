@@ -262,7 +262,7 @@ bool Server::handleCommand(Client &client, std::string &line){
         std::ostringstream msg;
         msg << "Commande inconnue '" << cmd << "' par '" << client.getNickname() << "'";
         Logger::log(INFO, msg.str());
-        sendReply(client, "421 " + client.getNickname() + " " + cmd + " :Unknown command");
+        sendReply(client, ":" + getServerName() + " 421 " + client.getNickname() + " " + cmd + " :Unknown command");
 	}
 	return false;
 }

@@ -31,23 +31,23 @@ bool isPolite(std::string &message){
 
 void PrivmsgCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
 	if (!client.isRegistered()){
-		server.sendReply(client, "451 " + client.getNickname() + " :You have not register");
+		server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not register");
 		return;
 	}
 	
 	if(args.empty()){
-		server.sendReply(client, "411 " + client.getNickname() + " :No recipient given (PRIVMSG)");
+		server.sendReply(client, ":" + server.getServerName() + " 411 " + client.getNickname() + " :No recipient given (PRIVMSG)");
 		return;
 	}
 
 	if (args.size() != 2){
-		server.sendReply(client, "461 PRIVMSG :Not enough parameters");
-		return;
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " PRIVMSG :Not enough parameters");
+        return;
 	}
 
 	if (args.size() == 1 || args[1].empty()){
-		server.sendReply(client, "412 :No text to send");
-		return;
+		server.sendReply(client, ":" + server.getServerName() + " 412 " + client.getNickname() + " PRIVMSG :No text to send");
+        return;
 	}
 
 	std::string target = args[0];
@@ -61,11 +61,11 @@ void PrivmsgCmd::execute(Server& server, Client& client, const std::vector<std::
 	if (target[0] == '#'){
 		Channel* channel = server.getChannel(target);
         if (!channel) {
-			server.sendReply(client, "403 " + client.getNickname() + " " + target + " :No such channel");
+			server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + target + " :No such channel");
             return;
         }
         if (!channel->isInChannel(&client)) {
-			server.sendReply(client, "404 " + client.getNickname() + " " + target + " :Cannot send to channel");
+			server.sendReply(client, ":" + server.getServerName() + " 404 " + client.getNickname() + " " + target + " :Cannot send to channel");
             return;
         }
 		if (isPolite(message)){
@@ -76,7 +76,7 @@ void PrivmsgCmd::execute(Server& server, Client& client, const std::vector<std::
 	else{
 		Client* targetClient = server.getClientByNick(target);
 		if (targetClient == NULL){
-			server.sendReply(client, "401 " + client.getNickname() + " " + target + " :No such nick/channel");
+			server.sendReply(client, ":" + server.getServerName() + " 401 " + client.getNickname() + " " + target + " :No such nick/channel");
 			return;
 		}
 		server.relayMessage(*targetClient, full);
