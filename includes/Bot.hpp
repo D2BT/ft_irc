@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 11:59:18 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/09 16:46:00 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 13:58:23 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include <map>
 #include <ctime>
 #include "./../includes/Client.hpp"
+
+class Server;
 
 class Bot{
     private:
@@ -49,6 +51,6 @@ class Bot{
 
         void setup(int port, std::string password);
         void setStr();
-        void sendMessage();
+        void sendMessage(Server& server);
         //void analyse(const std::string buffer);
 };

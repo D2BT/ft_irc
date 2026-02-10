@@ -6,13 +6,14 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/09 20:01:31 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:16:09 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Bot.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Logger.hpp"
+#include <map>
 
 Bot::Bot() : _fd(42), _nickname("BOT_nick"), _username("BOT_user"), _realname("BOT_real"){}
 
@@ -55,23 +56,30 @@ int Bot::getFd()const{
     return(this->_fd);
 }
 
-void Bot::sendMessage(/*recuperer le nom du channel*/){
-    // std::vector<std::string> kind;
-    
-    // std::vector<std::string> angry;
+void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
+
     static int kind = 0;
-    static int angry = 0;
-    //std::cout << "Ca fais 10s que personne n'a ecris... je me sens comme un bit isolee" << std::endl;
+    
     //for (/*all channelS, channel++ */){}
     if (/*all client of this channel are kind*/1 != 1){
         std::cout << _kind[kind % 6] << std::endl;
         kind++;
     }
     else{
-        std::cout/* "PRIVMSG #channel" */ << /*Client._nickname << */ _angry[angry % 8] << std::endl;
-        if (angry % 8 == 7)
-            /*channel.kickByBot(_nickname)*/ std::cout << "KICK" << std::endl;
-        angry++;
+        std::map<int, Client *> clientsList = server.getClients();
+        std::map<int, Client *>::iterator clientBegin = clientsList.begin();
+        std::map<int, Client *>::iterator clientEnd = clientsList.end();
+        for(;clientBegin != clientEnd; clientBegin++){
+            //std::cout << "ici" << std::endl;
+            if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
+                std::cout << "quelqu'un pas gentil ici" << std::endl;
+                server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % 8]);
+                if (clientBegin->second->getAngryLevel() % 8 == 7)
+                    /*channel.kickByBot(_nickname)*/ std::cout << "KICK" << std::endl;
+                std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
+                clientBegin->second->addLevelAngry(); //fonction dans client a faire
+            }
+        }
     }
 }
 
@@ -84,12 +92,12 @@ void Bot::setStr(){
     _kind.push_back("Surtout n'ecoutez pas Abenabbou, quand il vous propose une sortie velo...");
     _kind.push_back("Et attention a Qdebraba, il aime bronzer sans habits...");
 
-    _angry.push_back("404 : Politesse not found.");
-    _angry.push_back("tu connais la politesse ?!");
-    _angry.push_back("on s'est pas bien compris je crois !!");
-    _angry.push_back("tu connais Vald ? Ben dis bonjour sinon...!!");
-    _angry.push_back("attention, je vais te segfault au visage.");
-    _angry.push_back("encore un mot et je fais `rm -rf /` sur ta session.");
-    _angry.push_back("si l'intelligence était un bit, tu serais à 0.");
-    _angry.push_back("aller tchao j'te kick. 5...4...3...2...1...");
+    _angry.push_back(" error 404 : Politesse not found.");
+    _angry.push_back(" connais-tu la politesse ?!");
+    _angry.push_back(" on ne s'est pas bien compris je crois !!");
+    _angry.push_back(" tu connais Vald ? Ben dis bonjour sinon...!!");
+    _angry.push_back(" attention, je vais te segfault au visage.");
+    _angry.push_back(" encore un mot et je fais `rm -rf /` sur ta session.");
+    _angry.push_back(" si l'intelligence était un bit, tu serais à 0.");
+    _angry.push_back(" ?!!aller tchao j'te kick. 5...4...3...2...1...");
 }
