@@ -52,7 +52,7 @@ class Channel {
         bool                isInvited(Client &user) const;
         bool                isOperator(Client *user) const;
 
-        void                setChannelTopic(Client *user, std::string topic);
+        void                setChannelTopic(std::string topic);
 
         void                broadcastMessage(Server &server, std::string const &message);
         void                broadcastToOther(Server &server, std::string const &message, Client &client);
