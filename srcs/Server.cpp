@@ -30,8 +30,8 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         _commands["PART"] = new PartCmd();
         _commands["KICK"] = new KickCmd();
         _commands["QUIT"] = new QuitCmd();
-        /*_commands["TOPIC"] = new TopicCmd();
-        _commands["INVITE"] = new InviteCmd(); */
+        _commands["TOPIC"] = new TopicCmd();
+        /*_commands["INVITE"] = new InviteCmd(); */
     }
     catch (std::bad_alloc & e) {
         for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {

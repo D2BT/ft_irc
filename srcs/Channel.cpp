@@ -78,11 +78,7 @@ std::string const &Channel::getPasswordChannel() const {
     return this->_password;
 }
 
-void Channel::setChannelTopic(Client *user, std::string newTopic) {
-    std::vector<Client *>::const_iterator isAdmin = std::find(_admin.begin(), _admin.end(), user);
-    if (isAdmin == _admin.end()) {
-        throw NotAdmin();
-    }
+void Channel::setChannelTopic(std::string newTopic) {
     _topic = newTopic;
 }
 
