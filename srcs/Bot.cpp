@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 19:19:03 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 20:23:00 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,24 @@ int Bot::getFd()const{
 //     }
 // } 
 
+void Bot::messageToBadPeople(Server& server){
+    std::map<int, Client *> clientsList = server.getClients();
+    std::map<int, Client *>::iterator clientBegin = clientsList.begin();
+    std::map<int, Client *>::iterator clientEnd = clientsList.end();
+    for(;clientBegin != clientEnd; clientBegin++){
+        if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
+            server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % 8]);
+                if (clientBegin->second->getAngryLevel() % 8 == 7){
+                    server.disconnectClient(clientBegin->second->getFd());
+                    /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << clientBegin->second->getFd() << std::endl;
+                    continue;
+                }
+                std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
+                clientBegin->second->addLevelAngry(); //fonction dans client a faire
+            }
+    }
+}
+
 void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
     static int kind = 0;
 
@@ -104,6 +122,7 @@ void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
         }
     }
     kind++;
+    messageToBadPeople(server);
 }
 
 void Bot::setStr(){
