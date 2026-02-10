@@ -40,7 +40,7 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
         channel->addAdmin(&client);
     }
     else {
-        if (channel->isInChannel(client)){
+        if (channel->isInChannel(&client)){
             return;
         }
         if (channel->getUserLimit() > 0 && channel->getNumberOfUsers() >= channel->getUserLimit()){
