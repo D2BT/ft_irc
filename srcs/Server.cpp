@@ -20,27 +20,27 @@
 volatile bool Server::g_running = true;
 
 Server::Server(int port, std::string password): _port(port), _listenfd(-1), _serverName("my_irc_server"), _password(password){
-	try {
-		_commands["NICK"] = new NickCmd();
-		_commands["USER"] = new UserCmd();
-		_commands["PASS"] = new PassCmd();
-		_commands["PING"] = new PingCmd();
-		/*_commands["MODE"] = new ModeCmd();*/
-		_commands["JOIN"] = new JoinCmd();
-		/* _commands["PRIVMSG"] = new PrivmsgCmd();*/
-		_commands["PART"] = new PartCmd();
-		/*_commands["KICK"] = new KickCmd();*/
-		_commands["QUIT"] = new QuitCmd();
-		/*_commands["TOPIC"] = new TopicCmd();
-		_commands["INVITE"] = new InviteCmd(); */
-	}
-	catch (std::bad_alloc & e) {
-		for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
-			delete it->second;
-		}
-		_commands.clear();
-		throw;
-	}
+    try {
+        _commands["NICK"] = new NickCmd();
+        _commands["USER"] = new UserCmd();
+        _commands["PASS"] = new PassCmd();
+        _commands["PING"] = new PingCmd();
+        /*_commands["MODE"] = new ModeCmd();*/
+        _commands["JOIN"] = new JoinCmd();
+        _commands["PRIVMSG"] = new PrivmsgCmd();
+        _commands["PART"] = new PartCmd();
+        _commands["KICK"] = new KickCmd();
+        _commands["QUIT"] = new QuitCmd();
+        /*_commands["TOPIC"] = new TopicCmd();
+        _commands["INVITE"] = new InviteCmd(); */
+    }
+    catch (std::bad_alloc & e) {
+        for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
+            delete it->second;
+        }
+        _commands.clear();
+        throw;
+    }
 }
 
 // Destructeur du serveur IRC
@@ -223,11 +223,11 @@ void Server::disconnectClient(int fd){
 }
 
 void Server::notifyClientQuit(Client& client, const std::string& message){
-	for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
-		if (it->second->isInChannel(client)){
-			it->second->broadcastMessage(*this, message);
-		}
-	}
+    for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
+        if (it->second->isInChannel(&client)){
+            it->second->broadcastMessage(*this, message);
+        }
+    }
 }
 
 static std::string& trimLeft(std::string& s){
@@ -315,6 +315,19 @@ void Server::sendReply(const Client& client, const std::string& message){
 	std::ostringstream msg;
 	msg << "S--> [" << client.getNickname() << "]" << message;
 	Logger::log(DEBUG, msg.str());
+}
+
+void Server::relayMessage(Client& client, const std::string& message){
+    std::string fullMessage = message + "\r\n";
+
+    if (send(client.getFd(), fullMessage.c_str(), fullMessage.length(), 0) < 0){
+        std::ostringstream msg;
+        msg << "Erreur sur send() lors du relai a " << client.getNickname();
+        Logger::log(ERROR,msg.str());
+    }
+    std::ostringstream msg;
+    msg << "S--> Relaye a [" << client.getNickname() << "]" << message;
+    Logger::log(DEBUG, msg.str());
 }
 
 Client* Server::getClientByNick(const std::string& nick) {

@@ -13,12 +13,14 @@ SRC =	srcs/main.cpp \
 		srcs/Bot.cpp \
 		srcs/Channel.cpp \
 		srcs/JoinCmd.cpp \
+		srcs/KickCmd.cpp \
 		srcs/NickCmd.cpp \
 		srcs/UserCmd.cpp \
 		srcs/PartCmd.cpp \
 		srcs/PassCmd.cpp \
 		srcs/PingCmd.cpp \
-		srcs/QuitCmd.cpp
+		srcs/PrivmsgCmd.cpp \
+		srcs/QuitCmd.cpp \
 
 
 OBJ = $(SRC:srcs/%.cpp=$(OBJ_DIR)/%.o)

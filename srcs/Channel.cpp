@@ -86,12 +86,35 @@ void Channel::setChannelTopic(Client *user, std::string newTopic) {
     _topic = newTopic;
 }
 
-bool Channel::isInChannel(Client &user) const{
-    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); it++){
+bool Channel::isInChannel(Client *user) const {
+    if (!user)
+        return false;
+
+    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); ++it) {
+        if (*it == user)
+            return true;
+    }
+    return false;
+}
+
+bool Channel::isInvited(Client &user) const{
+    for (std::vector<Client *>::const_iterator it = _invits.begin(); it != _invits.end(); it++){
         if (*it == &user)
             return true;
     }
     return false;
+}
+
+bool Channel::isOperator(Client *user) const {
+    for (std::vector<Client *>::const_iterator it = _admin.begin(); it != _admin.end(); it++){
+        if (*it == user)
+            return true;
+    }
+    return false;
+}
+
+int Channel::getNumberOfUsers() const {
+    return static_cast<int>(_users.size());
 }
 
 bool Channel::getModeInvite() const {
@@ -129,6 +152,13 @@ void Channel::broadcastMessage(Server &server, std::string const &message){
         server.sendToClient(*_users[i], message);
 }
 
+void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){
+    for (std::vector<Client *>::iterator it = _users.begin(); it != _users.end(); it++){
+        if (*it && *it != &client)
+            server.sendToClient(**it, message);
+    }
+}
+
 std::string const Channel::getUserList() const {
     std::string userList;
     for (size_t i = 0; i < _users.size(); i++){
@@ -145,4 +175,8 @@ std::string const Channel::getUserList() const {
 
 const char *Channel::NotAdmin::what() const throw(){
     return "Not a Channel Operator.";
+}
+
+std::vector<Client *> Channel::getAdmin() const{
+    return _admin;
 }

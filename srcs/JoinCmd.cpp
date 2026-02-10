@@ -14,6 +14,11 @@ JoinCmd::JoinCmd() {}
 JoinCmd::~JoinCmd() {}
 
 void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> const &args) {
+    if (!client.isRegistered()){
+        server.sendReply(client, "451 " + client.getNickname() + " :You have not registered");
+        return;
+    }
+
     if (args.empty())
         return;
     std::vector<std::string> channelNames = split(args[0], ',');
@@ -24,7 +29,6 @@ void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> c
         std::string key = (i < keys.size() ? keys[i] : "");
         joinChannel(server, client, channelNames[i], key);
     }
-    
 }
 
 void JoinCmd::joinChannel(Server &server, Client &client, std::string channelName, std::string key){
@@ -36,6 +40,17 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
         channel->addAdmin(&client);
     }
     else {
+        if (channel->isInChannel(&client)){
+            return;
+        }
+        if (channel->getUserLimit() > 0 && channel->getNumberOfUsers() >= channel->getUserLimit()){
+            server.sendReply(client, ":" + server.getServerName() + " 471 " + client.getNickname() + " " + channelName + " ::Cannot join channel (+l)");
+            return;
+        }
+        if (channel->getModeInvite() && !channel->isInvited(client)){
+            server.sendReply(client, ":" + server.getServerName() + " 473 " + client.getNickname() + " " + channelName + " ::Cannot join channel (+i)");
+            return;
+        }
         std::string channelPwd = channel->getPasswordChannel();
         if (!channelPwd.empty() && key != channelPwd){
             server.sendReply(client, ":" + server.getServerName() + " 475 " + client.getNickname() + " " + channelName + " : Cannot join channel (+k)\r\n");
