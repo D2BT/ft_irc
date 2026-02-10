@@ -51,6 +51,7 @@ class Server{
         const std::string& getServerName() const;
 		
 		void sendReply(const Client& client, const std::string& message);
+		void relayMessage(Client& client, const std::string& message);
 		void disconnectClient(int fd);
 		void notifyClientQuit(Client& client, const std::string& message);
 		

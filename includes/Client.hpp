@@ -40,6 +40,7 @@ class Client{
 		int  getNbChannelIn() const;
 		int  getAngryLevel() const;
 		void addLevelAngry();
+		void saidHello();
 
 		void addToBuffer(const std::string& data);
 };

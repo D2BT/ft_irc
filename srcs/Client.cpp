@@ -1,4 +1,6 @@
 #include "../includes/Client.hpp"
+#include "../includes/Logger.hpp"
+#include "../includes/Server.hpp"
 
 // Constructeur par défaut
 Client::Client(){}
@@ -99,4 +101,8 @@ int  Client::getAngryLevel() const{
 
 void Client::addLevelAngry(){
 	this->_angry++;
+}
+
+void Client::saidHello(){
+	_saidHello = true;
 }
