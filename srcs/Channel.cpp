@@ -94,6 +94,26 @@ bool Channel::isInChannel(Client &user) const{
     return false;
 }
 
+bool Channel::isInvited(Client &user) const{
+    for (std::vector<Client *>::const_iterator it = _invits.begin(); it != _invits.end(); it++){
+        if (*it == &user)
+            return true;
+    }
+    return false;
+}
+
+bool Channel::isOperator(Client *user) const {
+    for (std::vector<Client *>::const_iterator it = _admin.begin(); it != _admin.end(); it++){
+        if (*it == user)
+            return true;
+    }
+    return false;
+}
+
+int Channel::getNumberOfUsers() const {
+    return static_cast<int>(_users.size());
+}
+
 bool Channel::getModeInvite() const {
     return _invitOnly;
 }
