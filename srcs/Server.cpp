@@ -15,59 +15,64 @@
 #include "../includes/TopicCmd.hpp"
 #include "../includes/InviteCmd.hpp"
 #include "../includes/Bot.hpp"
-//#include "../includes/Channel.hpp"
+#include "../includes/Channel.hpp"
 
 volatile bool Server::g_running = true;
 
 Server::Server(int port, std::string password): _port(port), _listenfd(-1), _serverName("my_irc_server"), _password(password){
-    /* try {
-        _commands["NICK"] = new NickCmd();
-        _commands["USER"] = new UserCmd();
-        _commands["PASS"] = new PassCmd();
-        _commands["PING"] = new PingCmd();
-        _commands["MODE"] = new ModeCmd();
-        _commands["JOIN"] = new JoinCmd();
-        _commands["PRIVMSG"] = new PrivmsgCmd();
-        _commands["PART"] = new PartCmd();
-        _commands["KICK"] = new KickCmd();
-        _commands["QUIT"] = new QuitCmd();
-        _commands["TOPIC"] = new TopicCmd();
-        _commands["INVITE"] = new InviteCmd();
-    }
-    catch (std::bad_alloc & e) {
-        for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
-            delete it->second;
-        }
-        _commands.clear();
-        throw;
-    } */
+	try {
+		_commands["NICK"] = new NickCmd();
+		_commands["USER"] = new UserCmd();
+		_commands["PASS"] = new PassCmd();
+		_commands["PING"] = new PingCmd();
+		/*_commands["MODE"] = new ModeCmd();*/
+		_commands["JOIN"] = new JoinCmd();
+		/* _commands["PRIVMSG"] = new PrivmsgCmd();*/
+		_commands["PART"] = new PartCmd();
+		/*_commands["KICK"] = new KickCmd();*/
+		_commands["QUIT"] = new QuitCmd();
+		/*_commands["TOPIC"] = new TopicCmd();
+		_commands["INVITE"] = new InviteCmd(); */
+	}
+	catch (std::bad_alloc & e) {
+		for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
+			delete it->second;
+		}
+		_commands.clear();
+		throw;
+	}
 }
 
 // Destructeur du serveur IRC
 // Libère la mémoire des commandes et des clients, ferme les sockets
 Server::~Server(){
 	std::map<std::string, ICmd*>::iterator ite = _commands.begin();
-    for (; ite != _commands.end(); ++ite)
-        delete ite->second;
-    _commands.clear();
+	for (; ite != _commands.end(); ++ite)
+		delete ite->second;
+	_commands.clear();
 
-    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it){
-        close (it->first);
-    }
-    _clients.clear();
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it){
+		close (it->first);
+		delete it->second;
+	}
+	_clients.clear();
 
-    if (_listenfd != -1)
-        close (_listenfd);
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++){
+		delete it->second;
+	}
+	_channels.clear();
+	if (_listenfd != -1)
+		close (_listenfd);
 
 	// close le bot ici si il est actif
 }
 
 void Server::signalHandler(int signum){
 	(void)signum;
-    std::ostringstream msg;
-    msg << "Signal " << signum << " reçu. Arrêt du serveur...";
-    Logger::log(INFO, msg.str());
-    Server::g_running = false;
+	std::ostringstream msg;
+	msg << "Signal " << signum << " reçu. Arrêt du serveur...";
+	Logger::log(INFO, msg.str());
+	Server::g_running = false;
 }
 
 // Prépare le serveur à écouter les connexions entrantes
@@ -122,8 +127,13 @@ int  Server::acceptNewClient(){
 	// Met la socket client en non-bloquant
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
-	// Ajoute le client à la map des clients (clé = fd)
-	_clients[client_fd] = Client(client_fd);
+	try {
+		_clients[client_fd] = new Client(client_fd);
+	}
+	catch (const std::bad_alloc& e) {
+		Logger::log(ERROR, "Impossible d'allouer le client - new error");
+		throw;
+	}
 
 	// Ajoute le fd du client à la liste surveillée par poll()
 	// Prépare une structure pollfd pour surveiller ce nouveau client
@@ -167,24 +177,32 @@ void Server::receiveFromClient(int fd){
 
 	// Ajoute les données reçues au buffer du client
 	buffer[bytes_read] = '\0';
-	Client &client = _clients[fd];
-	client.addToBuffer(std::string(buffer, bytes_read));
+	
+	std::map<int, Client*>::iterator it = _clients.find(fd);
+	if (it == _clients.end())
+		return;
 
-	// On traite les commandes complètes (finies par \r\n)
-	std::string& clientBuffer = client.getBuffer();
+	Client* client = it->second;
+	client->addToBuffer(std::string(buffer, bytes_read));
+
+	std::string& clientBuffer = client->getBuffer();
 	size_t pos;
+
 	while ((pos = clientBuffer.find("\r\n")) != std::string::npos) {
 		std::string line = clientBuffer.substr(0, pos);
 		clientBuffer.erase(0, pos + 2);
-		handleCommand(client, line);
+		bool clientDisconnected = handleCommand(*client, line);
+		if (clientDisconnected) {
+			return;
+		}
 	}
 }
 
 // Déconnecte proprement un client (ferme la socket, retire des listes)
 void Server::disconnectClient(int fd){
-	// Retire le client de la map (à améliorer : le retirer aussi des channels)
-	std::map<int, Client>::iterator clientIt = _clients.find(fd);
-	if (clientIt != _clients.end()){
+	std::map<int, Client*>::iterator clientIt = _clients.find(fd);
+	if (clientIt != _clients.end()){ //par la suite supprimer le client de tout les channels dans lequels il est 
+		delete clientIt->second;
 		_clients.erase(clientIt);
 	}
 
@@ -204,11 +222,19 @@ void Server::disconnectClient(int fd){
 	Logger::log(INFO, msg.str());
 }
 
+void Server::notifyClientQuit(Client& client, const std::string& message){
+	for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
+		if (it->second->isInChannel(client)){
+			it->second->broadcastMessage(*this, message);
+		}
+	}
+}
+
 static std::string& trimLeft(std::string& s){
-    size_t startpos = s.find_first_not_of(" \t\r\n");
-    if (std::string::npos != startpos)
-        s = s.substr(startpos);
-    return s;
+	size_t startpos = s.find_first_not_of(" \t\r\n");
+	if (std::string::npos != startpos)
+		s = s.substr(startpos);
+	return s;
 }
 
 bool Server::handleCommand(Client &client, std::string &line){
@@ -221,8 +247,8 @@ bool Server::handleCommand(Client &client, std::string &line){
 	iss >> cmd;
 
 	std::string rest;
-    std::getline(iss, rest);
-    rest = trimLeft(rest);
+	std::getline(iss, rest);
+	rest = trimLeft(rest);
 
 	std::vector<std::string> args;
 	std::string token;
@@ -244,15 +270,30 @@ bool Server::handleCommand(Client &client, std::string &line){
 	for (size_t i = 0; i < cmd.size(); i++) {cmd[i] = std::toupper(cmd[i]);}
 
 	std::map<std::string, ICmd*>::iterator it = _commands.find(cmd);
-	if (it != _commands.end()){ // cas ou la commade est connu
-		// ajouter verif que le client existe 
-        it->second->execute(*this, client, args);
+	if (it != _commands.end()){
+		std::ostringstream msg;
+		std::string nick;
+		if (client.getNickname().empty()){
+			std::ostringstream oss_nick;
+			oss_nick << "fd=" << client.getFd();
+			nick = oss_nick.str();
+		}
+		else
+			nick = client.getNickname();
+		msg << "Exécution de " << cmd << " par '" << nick << "'";
+		Logger::log(CMD, msg.str());
+
+		int clientFd = client.getFd();
+		it->second->execute(*this, client, args);
+		if (_clients.find(clientFd) == _clients.end()) {
+			return true;
+		}
 	}
 	else { // Commande Inconnue !
-        std::ostringstream msg;
-        msg << "Commande inconnue '" << cmd << "' par '" << client.getNickname() << "'";
-        Logger::log(INFO, msg.str());
-        sendReply(client, "421 " + client.getNickname() + " " + cmd + " :Unknown command");
+		std::ostringstream msg;
+		msg << "Commande inconnue '" << cmd << "' par '" << client.getNickname() << "'";
+		Logger::log(INFO, msg.str());
+		sendReply(client, "421 " + client.getNickname() + " " + cmd + " :Unknown command");
 	}
 	return false;
 }
@@ -276,6 +317,22 @@ void Server::sendReply(const Client& client, const std::string& message){
 	Logger::log(DEBUG, msg.str());
 }
 
+Client* Server::getClientByNick(const std::string& nick) {
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->second->getNickname() == nick)
+			return (it->second);
+	}
+	return NULL;
+}
+
+const std::string& Server::getPassword() const{
+	return _password;
+}
+
+const std::string& Server::getServerName() const{
+	return _serverName;
+}
+
 void Server::run(){
 	time_t start = time(NULL);
 
@@ -294,9 +351,8 @@ void Server::run(){
 
 	while(Server::g_running)
 	{
-		//std::cout << "Recoit signal 1" << std::endl;
 		if ((time(NULL) - start) > 10){
-			iRoBot.sendMessage();
+			iRoBot.sendMessage(*this);
 			start = time(NULL);
 		}
 
@@ -305,7 +361,6 @@ void Server::run(){
 		if (activity < 0 && Server::g_running){
 			throw PollError();
 		}
-		//std::cout << "Recoit signal 2" << std::endl;
 
 		// Parcourt toutes les sockets surveillées
 		for (size_t i = 0; i < _pfds.size(); i++){
@@ -316,11 +371,54 @@ void Server::run(){
 					acceptNewClient();
 				// Sinon : données d'un client existant
 				else{
-					start = time(NULL);													//TIME
-					std::cout << "Recoit signal 3" << " time: " << start << std::endl;
+					start = time(NULL);
 					receiveFromClient(_pfds[i].fd);
 				}
 			}
 		}
 	}
+}
+
+void Server::sendToClient(Client& client, const std::string& message){
+	std::string fullMessage = message + "\r\n";
+
+	size_t total = 0;
+	while (total < fullMessage.size()) {
+		ssize_t bytes = send(client.getFd(), fullMessage.c_str() + total, fullMessage.size() - total, 0);
+		if (bytes < 0) {
+			std::ostringstream msg;
+			msg << "Erreur: impossible d'envoyer des données au client (fd: " << client.getFd() << ").";
+			Logger::log(DEBUG, msg.str());
+			break;
+		}
+		total += bytes;
+	}
+	std::ostringstream msg;
+	msg << "S--> [" << client.getNickname() << "] " << message;
+	Logger::log(DEBUG, msg.str());
+}
+
+Channel *Server::getChannel(std::string const &channelName) const {
+	std::map<std::string, Channel *>::const_iterator it = _channels.find(channelName);
+	if (it == _channels.end())
+		return NULL;
+	return it->second;
+}
+
+Channel *Server::createChannel(std::string channelName, std::string password){
+	if (getChannel(channelName) == NULL){
+		Channel *newChannel = new Channel(channelName, "", password);
+		_channels[channelName] = newChannel;
+		return newChannel;
+	}
+	return _channels[channelName];
+}
+
+
+std::map<std::string, Channel *> Server::getChannels() const {
+	return _channels;
+}
+
+std::map<int, Client *> Server::getClients() const{
+	return _clients;
 }

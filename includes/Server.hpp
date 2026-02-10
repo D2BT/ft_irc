@@ -2,6 +2,7 @@
 
 #include "../includes/Client.hpp"
 #include "../includes/ICmd.hpp"
+#include "../includes/Channel.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -19,14 +20,17 @@
 #include <fcntl.h>
 #include "ICmd.hpp"
 
+class Channel;
+
 class Server{
 	private:
 		int _port;
 		int _listenfd;
 		std::string _serverName;
 		std::string _password;
-		std::map<int, Client> _clients;
+		std::map<int, Client *> _clients;
 		std::map<std::string, ICmd*> _commands;
+		std::map<std::string, Channel *> _channels;
 		std::vector<pollfd> _pfds;
 
 		int  acceptNewClient();
@@ -34,16 +38,26 @@ class Server{
 		void receiveFromClient(int fd);
 		bool handleCommand(Client &client, std::string &line);
 		
-		public:
+	public:
 		Server(int port, std::string password);
 		// Destructeur : libère les ressources
 		~Server();
 		
 		static volatile bool g_running;
 		static void signalHandler(int signum);
+
+		Client* getClientByNick(const std::string& nick);
+        const std::string& getPassword() const;
+        const std::string& getServerName() const;
 		
 		void sendReply(const Client& client, const std::string& message);
 		void disconnectClient(int fd);
+		void notifyClientQuit(Client& client, const std::string& message);
+		
+		void sendToClient(Client& client, const std::string& message);
+		Channel *createChannel(std::string channelName, std::string password = "");
+		Channel *getChannel(std::string const &channelName) const;
+		std::map<std::string, Channel *> getChannels() const;
 
 		// Prépare le serveur à écouter les connexions
 		void setup();
