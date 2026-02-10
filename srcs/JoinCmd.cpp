@@ -60,7 +60,7 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
     }
     channel->addClient(&client);
     client.addOneChannel();
-    std::string joinMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN :" + channelName + "\r\n";
+    std::string joinMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " JOIN:" + channelName + "\r\n";
     channel->broadcastMessage(server, joinMsg);
     if (channel->getChannelTopic().empty())
         server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + channelName + ": No Topic is set" + "\r\n");

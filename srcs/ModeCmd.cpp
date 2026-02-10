@@ -10,7 +10,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
         return;
     }
     if (args.size() < 2){
-        server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE :Not enought parameters");
+        server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE :Not enough parameters");
         return;
     }
     std::string channelName = args[0];
@@ -58,7 +58,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
             case 'k' :{
                 if (adding) {
                     if (argsIndex >= args.size()){
-                        server.sendReply(client, "461 " + client.getNickname() + " MODE +k :Not enough parameters");
+                        server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE +k :Not enough parameters");
                         continue;
                     }
                     channel->setPassword(args[argsIndex]);
@@ -75,7 +75,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
             case 'l' :{
                 if (adding){
                     if (argsIndex >= args.size()){
-                        server.sendReply(client, "461 " + client.getNickname() + " MODE +l :Not enough parameters");
+                        server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE +l :Not enough parameters");
                         continue;
                     }
                     channel->setUserLimit(std::atoi(args[argsIndex].c_str()));
@@ -93,13 +93,13 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
             case 'o' :{
                 if (argsIndex >= args.size()) {
                     std::string action = adding ? "+o" : "-o";
-                    server.sendReply(client, "461 " + client.getNickname() + " MODE " + action + " :Not enough parameters");
+                    server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE " + action + " :Not enough parameters");
                     continue;
                 }
                 std::string const &target = args[argsIndex];
                 Client *targetUser = server.getClientByNick(target);
                 if (!targetUser || !channel->isInChannel(targetUser)) {
-                    server.sendReply(client, "401 " + client.getNickname() + " " + target + " :No such nick/channel");
+                    server.sendReply(client, ":" + server.getServerName() + " 401 " + client.getNickname() + " " + target + " :No such nick/channel");
                     argsIndex++;
                     continue;
                 }
@@ -116,7 +116,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
                 argsIndex++;
             }
             default :{
-				server.sendReply(client, "472 " + client.getNickname() + " " + mode + " :Unknown mode char for " + channelName);
+				server.sendReply(client, ":" + server.getServerName() + " 472 " + client.getNickname() + " " + mode + " :Unknown mode char for " + channelName);
 				break;
             }
         }

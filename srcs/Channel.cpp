@@ -1,9 +1,9 @@
 #include "../includes/Channel.hpp"
 #include "../includes/Server.hpp"
 
-Channel::Channel() : _name("Default"), _topic("Default"), _password(""), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
+Channel::Channel() : _name("Default"), _topic("Default"), _password(""), _userLimit(0), _invitOnly(false), _restrictedTopic(true) {}
 
-Channel::Channel(std::string name, std::string topic, std::string password) : _name(name), _topic(topic), _password(password), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
+Channel::Channel(std::string name, std::string topic, std::string password) : _name(name), _topic(topic), _password(password), _userLimit(0), _invitOnly(false), _restrictedTopic(true) {}
 
 Channel::Channel(Channel const &src){
     _name = src._name;
@@ -102,6 +102,11 @@ bool Channel::isInvited(Client *user) const{
             return true;
     }
     return false;
+}
+
+void Channel::addInvited(Client *user) {
+    if (!isInvited(user))
+        _invits.push_back(user);
 }
 
 bool Channel::isOperator(Client *user) const {
