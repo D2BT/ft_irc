@@ -12,6 +12,7 @@ class Client{
         bool _isRegistered;
         bool _isAuthenticated;
 		bool _saidHello;
+		int _nbChannelIn;
 
 	public:
 		Client();
@@ -32,6 +33,8 @@ class Client{
 		bool isRegistered() const;
 		bool isAuthenticated() const;
 		std::string& getBuffer();
+		void addOneChannel();
+		void removeOneChannel();
 
 		void addToBuffer(const std::string& data);
 };

@@ -49,6 +49,7 @@ void PartCmd::execute(Server& server, Client& client, const std::vector<std::str
 			partMessage = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " PART " + channelsToLeave[i];
 		channel->broadcastMessage(server, partMessage);
 		channel->removeClient(&client);
+		client.removeOneChannel();
 	}
 
 }

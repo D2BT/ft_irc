@@ -2,7 +2,7 @@
 
 Client::Client(){}
 
-Client::Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _isRegistered(false), _isAuthenticated(false), _saidHello(false){}
+Client::Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _isRegistered(false), _isAuthenticated(false), _saidHello(false), _nbChannelIn(0){}
 
 Client::~Client(){}
 
@@ -60,4 +60,14 @@ std::string& Client::getBuffer(){
 
 void Client::addToBuffer(const std::string& data){
 	this->_buffer += data;
+}
+
+void Client::addOneChannel(){
+	_nbChannelIn += 1;
+}
+
+void Client::removeOneChannel(){
+	_nbChannelIn -= 1;
+	if (_nbChannelIn < 0)
+		_nbChannelIn = 0;
 }
