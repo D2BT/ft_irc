@@ -86,9 +86,12 @@ void Channel::setChannelTopic(Client *user, std::string newTopic) {
     _topic = newTopic;
 }
 
-bool Channel::isInChannel(Client &user) const{
-    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); it++){
-        if (*it == &user)
+bool Channel::isInChannel(Client *user) const {
+    if (!user)
+        return false;
+
+    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); ++it) {
+        if (*it == user)
             return true;
     }
     return false;
@@ -129,6 +132,13 @@ void Channel::broadcastMessage(Server &server, std::string const &message){
         server.sendToClient(*_users[i], message);
 }
 
+void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){
+    for (std::vector<Client *>::iterator it = _users.begin(); it != _users.end(); it++){
+        if (*it && *it != &client)
+            server.sendToClient(**it, message);
+    }
+}
+
 std::string const Channel::getUserList() const {
     std::string userList;
     for (size_t i = 0; i < _users.size(); i++){
@@ -145,4 +155,8 @@ std::string const Channel::getUserList() const {
 
 const char *Channel::NotAdmin::what() const throw(){
     return "Not a Channel Operator.";
+}
+
+std::vector<Client *> Channel::getAdmin() const{
+    return _admin;
 }

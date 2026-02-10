@@ -26,9 +26,9 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         _commands["PING"] = new PingCmd();
         /*_commands["MODE"] = new ModeCmd();*/
         _commands["JOIN"] = new JoinCmd();
-       /* _commands["PRIVMSG"] = new PrivmsgCmd();*/
+        _commands["PRIVMSG"] = new PrivmsgCmd();
         _commands["PART"] = new PartCmd();
-        /*_commands["KICK"] = new KickCmd();*/
+        _commands["KICK"] = new KickCmd();
         _commands["QUIT"] = new QuitCmd();
         /*_commands["TOPIC"] = new TopicCmd();
         _commands["INVITE"] = new InviteCmd(); */
@@ -193,7 +193,7 @@ void Server::disconnectClient(int fd){
 
 void Server::notifyClientQuit(Client& client, const std::string& message){
     for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
-        if (it->second->isInChannel(client)){
+        if (it->second->isInChannel(&client)){
             it->second->broadcastMessage(*this, message);
         }
     }
@@ -284,6 +284,19 @@ void Server::sendReply(const Client& client, const std::string& message){
 	std::ostringstream msg;
 	msg << "S--> [" << client.getNickname() << "]" << message;
 	Logger::log(DEBUG, msg.str());
+}
+
+void Server::relayMessage(Client& client, const std::string& message){
+    std::string fullMessage = message + "\r\n";
+
+    if (send(client.getFd(), fullMessage.c_str(), fullMessage.length(), 0) < 0){
+        std::ostringstream msg;
+        msg << "Erreur sur send() lors du relai a " << client.getNickname();
+        Logger::log(ERROR,msg.str());
+    }
+    std::ostringstream msg;
+    msg << "S--> Relaye a [" << client.getNickname() << "]" << message;
+    Logger::log(DEBUG, msg.str());
 }
 
 Client* Server::getClientByNick(const std::string& nick) {

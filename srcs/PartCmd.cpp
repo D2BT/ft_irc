@@ -5,8 +5,13 @@ PartCmd::PartCmd(){}
 PartCmd::~PartCmd(){}
 
 void PartCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
+	if (!client.isRegistered()){
+		server.sendReply(client, "451 " + client.getNickname() + " :You have not register");
+		return;
+	}
+	
 	if (args.empty()){
-		server.sendReply(client, "461 PART :Not enough parameters");
+		server.sendReply(client, "461 " + client.getNickname() + " :Not enough parameters");
 		return;
 	}
 
@@ -37,7 +42,7 @@ void PartCmd::execute(Server& server, Client& client, const std::vector<std::str
 			continue;
 		}
 
-		if (!channel->isInChannel(client)){
+		if (!channel->isInChannel(&client)){
 			server.sendReply(client, "442 " + client.getNickname() + " " + channelsToLeave[i]+ " :You're not on that channel");
 			continue;
 		}

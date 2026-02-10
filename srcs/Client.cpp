@@ -1,4 +1,6 @@
 #include "../includes/Client.hpp"
+#include "../includes/Logger.hpp"
+#include "../includes/Server.hpp"
 
 Client::Client(){}
 
@@ -70,4 +72,8 @@ void Client::removeOneChannel(){
 	_nbChannelIn -= 1;
 	if (_nbChannelIn < 0)
 		_nbChannelIn = 0;
+}
+
+void Client::saidHello(){
+	_saidHello = true;
 }
