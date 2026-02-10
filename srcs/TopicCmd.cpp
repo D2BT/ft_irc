@@ -7,34 +7,34 @@ TopicCmd::~TopicCmd(){}
 
 void TopicCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
 	if (!client.isRegistered()){
-		server.sendReply(client, "451 " + client.getNickname() + " :You have not registered");
+		server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not registered");
 		return;
 	}
 
 	if (args.size() < 1){
-		server.sendReply(client, "461 " + client.getNickname() + " TOPIC :Not enough parameters");
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " TOPIC :Not enough parameters");
 		return;
 	}
 
 	Channel* channel = server.getChannel(args[0]);
 	if (channel == NULL){
-		server.sendReply(client, "403 " + client.getNickname() + " " + args[0] + " :No such channel");
+		server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + args[0] + " :No such channel");
 		return;
 	}
 
 	if (!channel->isInChannel(&client)){
-		server.sendReply(client, "442 " + client.getNickname() + " " + args[0] + " :You're not on that channel");
+		server.sendReply(client, ":" + server.getServerName() + " 442 " + client.getNickname() + " " + args[0] + " :You're not on that channel");
 		return;
 	}
 
 	if (args.size() == 1){
 		const std::string& topic = channel->getChannelTopic();
 		if (topic.empty()){
-			server.sendReply(client, "331 " + client.getNickname() + " " + args[0] + " :No topic is set");
+			server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + args[0] + " :No topic is set");
 			return;
 		}
 		else
-			server.sendReply(client, "332 " + client.getNickname() + " " + args[0] + " :" + topic);
+			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + args[0] + " :" + topic);
 	}
 	else if (args.size() > 1 && channel->getModeTopic()){
 		std::vector<Client *> admin = channel->getAdmin();
@@ -44,7 +44,7 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 				break;
 		}
 		if (it == admin.end()){
-			server.sendReply(client, "482 " + client.getNickname() + " " + args[0] + " :You're not channel operator");
+			server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " " + args[0] + " :You're not channel operator");
 			return;
 		}
 		channel->setChannelTopic(args[1]);
