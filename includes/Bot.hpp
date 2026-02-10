@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 11:59:18 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 13:58:23 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 20:17:55 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,6 @@ class Bot{
         void setup(int port, std::string password);
         void setStr();
         void sendMessage(Server& server);
+        void messageToBadPeople(Server& server);
         //void analyse(const std::string buffer);
 };
