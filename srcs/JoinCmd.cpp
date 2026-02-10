@@ -32,6 +32,11 @@ void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> c
 }
 
 void JoinCmd::joinChannel(Server &server, Client &client, std::string channelName, std::string key){
+    if (!client.isRegistered()){
+		server.sendReply(client, "451 " + client.getNickname() + " :You have not register");
+		return;
+	}
+        
     if (channelName[0] != '#')
         return;
     Channel *channel = server.getChannel(channelName);
