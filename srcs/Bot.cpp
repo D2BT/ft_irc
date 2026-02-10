@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 15:16:09 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/10 16:48:04 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,11 @@ void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
             if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
                 std::cout << "quelqu'un pas gentil ici" << std::endl;
                 server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % 8]);
-                if (clientBegin->second->getAngryLevel() % 8 == 7)
-                    /*channel.kickByBot(_nickname)*/ std::cout << "KICK" << std::endl;
+                if (clientBegin->second->getAngryLevel() % 8 == 7){
+                    server.disconnectClient(clientBegin->second->getFd());
+                    /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << clientBegin->second->getFd() << std::endl;
+                    continue;
+                }
                 std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
                 clientBegin->second->addLevelAngry(); //fonction dans client a faire
             }
@@ -89,7 +92,7 @@ void Bot::setStr(){
     _kind.push_back("J'aimerais bien aller au camp Forty2 avec vous.");
     _kind.push_back("Il parait que les huitres y sont super bonnes, j'ai entendu dire que la flipper Marvel est incroyable.");
     _kind.push_back("Faut Juste pas donner de micro a Mdsiurds...");
-    _kind.push_back("Surtout n'ecoutez pas Abenabbou, quand il vous propose une sortie velo...");
+    _kind.push_back("Surtout n'ecoutez pas Abenabbo, quand il vous propose une sortie velo...");
     _kind.push_back("Et attention a Qdebraba, il aime bronzer sans habits...");
 
     _angry.push_back(" error 404 : Politesse not found.");

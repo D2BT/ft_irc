@@ -364,7 +364,8 @@ void Server::run(){
 
 	while(Server::g_running)
 	{
-		if ((time(NULL) - start) > 10){
+		//runbot(start);
+		if ((time(NULL) - start) > 20){
 			iRoBot.sendMessage(*this);
 			start = time(NULL);
 		}
