@@ -27,35 +27,37 @@ class Channel {
         Channel &operator=(Channel const &rhs);
         ~Channel();
         
-        void                addAdmin(Client *user);
-        void                removeAdmin(Client *user);
-        void                addClient(Client *user);
-        void                removeClient(Client *user);
+        void                    addAdmin(Client *user);
+        void                    removeAdmin(Client *user);
+        void                    addClient(Client *user);
+        void                    removeClient(Client *user);
 
-        std::string const &getChannelName() const;
-        std::string const &getChannelTopic() const;
-        std::string const &getPasswordChannel() const;
-        std::string const getUserList() const;
-        int               getNumberOfUsers() const;
+        std::string const       &getChannelName() const;
+        std::string const       &getChannelTopic() const;
+        std::string const       &getPasswordChannel() const;
+        std::string const       getUserList() const;
+        int                     getNumberOfUsers() const;
 
-        void                setModeInvite(bool val);
-        void                setModeTopic(bool val);
-        void                setUserLimit(int val);
-        void                setPassword(std::string password);
+        void                    setModeInvite(bool val);
+        void                    setModeTopic(bool val);
+        void                    setUserLimit(int val);
+        void                    setPassword(std::string password);
 
-        bool                getModeInvite() const;
-        bool                getModeTopic() const;
-        int                 getUserLimit() const;
-        std::vector<Client *> getAdmin() const;
+        bool                    getModeInvite() const;
+        bool                    getModeTopic() const;
+        int                     getUserLimit() const;
+        std::vector<Client *>   getAdmin() const;
 
-        bool                isInChannel(Client *user) const;
-        bool                isInvited(Client *user) const;
-        bool                isOperator(Client *user) const;
+        bool                    isInChannel(Client *user) const;
+        bool                    isOperator(Client *user) const;
+        
+        bool                    isInvited(Client *user) const;
+        void                    addInvited(Client *user);
 
-        void                setChannelTopic(std::string topic);
+        void                    setChannelTopic(std::string topic);
 
-        void                broadcastMessage(Server &server, std::string const &message);
-        void                broadcastToOther(Server &server, std::string const &message, Client &client);
+        void                    broadcastMessage(Server &server, std::string const &message);
+        void                    broadcastToOther(Server &server, std::string const &message, Client &client);
 
         class NotAdmin : public std::exception {
             public :

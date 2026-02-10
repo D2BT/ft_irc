@@ -17,20 +17,20 @@ static bool IsValidNick(std::string &str){
 
 void NickCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
 	if (args.empty()){
-		server.sendReply(client, "431 " + client.getNickname() + " :No nickname given");
+		server.sendReply(client, ":" + server.getServerName() + " 431 " + client.getNickname() + " :No nickname given");
         return;
 	}
 	if (args.size() > 1){
-		server.sendReply(client, "461 " + client.getNickname() + " :Too many arguments");
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " :Too many arguments");
         return;
 	}
 	if (args[0].size() > 9){
-		server.sendReply(client, "432 " + client.getNickname() + " :Erroneus nickname");
+		server.sendReply(client, ":" + server.getServerName() + " 432 " + client.getNickname() + " :Erroneus nickname");
         return;
 	}
 	std::string newNick = args[0];
 	if (!IsValidNick(newNick)){
-		server.sendReply(client, "432 " + client.getNickname() + " :Erroneus nickname");
+		server.sendReply(client, ":" + server.getServerName() + " 432 " + client.getNickname() + " :Erroneus nickname");
         return;
 	}
 	const std::string oldNick = client.getNickname();
@@ -44,7 +44,7 @@ void NickCmd::execute(Server& server, Client& client, const std::vector<std::str
 			nickToUse = "*";
 		else;
 			nickToUse = oldNick;
-		server.sendReply(client, "433 " + nickToUse + " " + newNick + " :Nickname is already in use");
+		server.sendReply(client, ":" + server.getServerName() + " 433 " + nickToUse + " " + newNick + " :Nickname is already in use");
 		return;
 	}
 
@@ -61,6 +61,6 @@ void NickCmd::execute(Server& server, Client& client, const std::vector<std::str
 
 	if (!client.isRegistered() && !client.getUsername().empty()){
         client.setRegistered(true);
-        server.sendReply(client, "001 " + newNick + " :Welcome to my IRC Network, " + newNick);
+        server.sendReply(client, ":" + server.getServerName() + " 001 " + newNick + " :Welcome to my IRC Network, " + newNick);
     }
 }

@@ -7,23 +7,23 @@ KickCmd::~KickCmd(){}
 
 void KickCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
 	if (!client.isRegistered()){
-		server.sendReply(client, "451 " + client.getNickname() + " :You have not registered");
+		server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not registered");
 		return;
 	}
 
 	if (args.size() < 2){
-		server.sendReply(client, "461 " + client.getNickname() + " KICK :Not enough parameters");
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " KICK :Not enough parameters");
 		return;
 	}
 
 	Channel* channel = server.getChannel(args[0]);
 	if (channel == NULL){
-		server.sendReply(client, "403 " + client.getNickname() + " " + args[0] + " :No such channel");
+		server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + args[0] + " :No such channel");
 		return;
 	}
 
 	if (!channel->isInChannel(&client)){
-		server.sendReply(client, "442 " + client.getNickname() + " " + args[0] + " :You're not on that channel");
+		server.sendReply(client, ":" + server.getServerName() + " 442 " + client.getNickname() + " " + args[0] + " :You're not on that channel");
 		return;
 	}
 
@@ -34,14 +34,14 @@ void KickCmd::execute(Server& server, Client& client, const std::vector<std::str
 			break;
 	}
 	if (it == admin.end()){
-		server.sendReply(client, "482 " + client.getNickname() + " " + args[0] + " :You're not channel operator");
+		server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " " + args[0] + " :You're not channel operator");
 		return;
 	}
 
 	std::string target = args[1];
 	Client* targetClient = server.getClientByNick(target);
 	if (!targetClient || !channel->isInChannel(targetClient)){
-		server.sendReply(client, "441 " + client.getNickname() + " " + target + " " + args[0] + " :They aren't on that channel");
+		server.sendReply(client, ":" + server.getServerName() + " 441 " + client.getNickname() + " " + target + " " + args[0] + " :They aren't on that channel");
 		return;
 	}
 
