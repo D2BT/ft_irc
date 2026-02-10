@@ -13,6 +13,7 @@ SRC =	srcs/main.cpp \
 		srcs/Client.cpp \
 		srcs/JoinCmd.cpp \
 		srcs/KickCmd.cpp \
+		srcs/ModeCmd.cpp \
 		srcs/NickCmd.cpp \
 		srcs/PartCmd.cpp \
 		srcs/PassCmd.cpp \

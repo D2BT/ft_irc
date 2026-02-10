@@ -53,6 +53,12 @@ void Channel::addAdmin(Client *user) {
     return;
 }
 
+void Channel::removeAdmin(Client *user) {
+    std::vector<Client *>::iterator it = std::find(_admin.begin(), _admin.end(), user);
+    if (it != _admin.end())
+        _admin.erase(it);
+}
+
 void Channel::removeClient(Client *user) {
     std::vector<Client *>::iterator here = std::find(_users.begin(), _users.end(), user);
     if (here == _users.end()){
@@ -82,20 +88,17 @@ void Channel::setChannelTopic(std::string newTopic) {
     _topic = newTopic;
 }
 
-bool Channel::isInChannel(Client *user) const {
-    if (!user)
-        return false;
-
-    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); ++it) {
+bool Channel::isInChannel(Client *user) const{
+    for (std::vector<Client *>::const_iterator it = _users.begin(); it != _users.end(); it++){
         if (*it == user)
             return true;
     }
     return false;
 }
 
-bool Channel::isInvited(Client &user) const{
+bool Channel::isInvited(Client *user) const{
     for (std::vector<Client *>::const_iterator it = _invits.begin(); it != _invits.end(); it++){
-        if (*it == &user)
+        if (*it == user)
             return true;
     }
     return false;

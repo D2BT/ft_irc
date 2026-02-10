@@ -28,6 +28,7 @@ class Channel {
         ~Channel();
         
         void                addAdmin(Client *user);
+        void                removeAdmin(Client *user);
         void                addClient(Client *user);
         void                removeClient(Client *user);
 
@@ -45,11 +46,10 @@ class Channel {
         bool                getModeInvite() const;
         bool                getModeTopic() const;
         int                 getUserLimit() const;
-
         std::vector<Client *> getAdmin() const;
 
         bool                isInChannel(Client *user) const;
-        bool                isInvited(Client &user) const;
+        bool                isInvited(Client *user) const;
         bool                isOperator(Client *user) const;
 
         void                setChannelTopic(std::string topic);

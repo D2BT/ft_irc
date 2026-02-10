@@ -24,7 +24,7 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         _commands["USER"] = new UserCmd();
         _commands["PASS"] = new PassCmd();
         _commands["PING"] = new PingCmd();
-        /*_commands["MODE"] = new ModeCmd();*/
+        _commands["MODE"] = new ModeCmd();
         _commands["JOIN"] = new JoinCmd();
         _commands["PRIVMSG"] = new PrivmsgCmd();
         _commands["PART"] = new PartCmd();
@@ -304,7 +304,7 @@ Client* Server::getClientByNick(const std::string& nick) {
         if (it->second->getNickname() == nick)
             return (it->second);
     }
-    return nullptr;
+    return NULL;
 }
 
 const std::string& Server::getPassword() const{
