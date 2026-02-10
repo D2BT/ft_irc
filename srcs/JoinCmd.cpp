@@ -44,6 +44,7 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
 
     }
     channel->addClient(&client);
+    client.addOneChannel();
     std::string joinMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN :" + channelName + "\r\n";
     channel->broadcastMessage(server, joinMsg);
     if (channel->getChannelTopic().empty())
