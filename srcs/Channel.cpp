@@ -1,9 +1,9 @@
 #include "../includes/Channel.hpp"
 #include "../includes/Server.hpp"
 
-Channel::Channel() : _name("Default"), _topic("Default"), _password(""), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
+Channel::Channel() : _kind(0), _name("Default"), _topic("Default"), _password(""), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
 
-Channel::Channel(std::string name, std::string topic, std::string password) : _name(name), _topic(topic), _password(password), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
+Channel::Channel(std::string name, std::string topic, std::string password) : _kind(0), _name(name), _topic(topic), _password(password), _invitOnly(false), _restrictedTopic(true), _userLimit(0) {}
 
 Channel::Channel(Channel const &src){
     _name = src._name;
@@ -149,7 +149,13 @@ void Channel::setPassword(std::string password) {
     _password = password;
 }
 
+int Channel::getKind() const{
+    return _kind;
+}
 
+void Channel::addOneToKind(){
+    _kind += 1;
+}
 
 void Channel::broadcastMessage(Server &server, std::string const &message){ // all AND me
     for (size_t i = 0; i < _users.size(); i++)

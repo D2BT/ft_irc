@@ -50,22 +50,17 @@ void Bot::messageToBadPeople(Server& server){
         if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
             server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % _angry.size()]);
                 if (clientBegin->second->getAngryLevel() % _angry.size() == 7){
-                    std::string reason = clientBegin->second->getNickname() + "Kick because was not polite !";
+                    std::string reason = " :Kick car il n'est pas poli.";
                     server.notifyClientKick((*clientBegin->second), reason);
-                    server.disconnectClient(clientBegin->second->getFd());
-                    //msg to all client
-                    
-                    /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << clientBegin->second->getFd() << std::endl;
+                    server.disconnectClient(clientBegin->second->getFd());                    
                     continue;
                 }
-                clientBegin->second->addLevelAngry(); //fonction dans client a faire
+                clientBegin->second->addLevelAngry();
             }
     }
 }
 
 void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
-    int kind = 0;
-
     std::map<std::string, Channel *> channel = server.getChannels();
     for (std::map<std::string, Channel *>::iterator itChannel = channel.begin(); itChannel != channel.end(); itChannel++){
         std::vector<Client *> users = itChannel->second->getUsers();
@@ -76,15 +71,15 @@ void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
             }
         }
         if (itClient == users.end()){
-            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() + " :" + _kind[kind % _kind.size()];
+            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() + " :" + _kind[itChannel->second->getKind() % _kind.size()];
+            itChannel->second->addOneToKind();
             itChannel->second->broadcastMessage(server, botMsg);
         }
         else{
-            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() +" :WARNING ! Someone is not polite there !";
+            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() +" :Attention ! Quelqu'un n'a pas dit bonjour.";
             itChannel->second->broadcastMessage(server, botMsg);
         }
     }
-    kind++;
     messageToBadPeople(server);
 }
 

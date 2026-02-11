@@ -12,6 +12,7 @@ SRC =	srcs/main.cpp \
 		srcs/Client.cpp \
 		srcs/Bot.cpp \
 		srcs/Channel.cpp \
+		srcs/InviteCmd.cpp \
 		srcs/JoinCmd.cpp \
 		srcs/KickCmd.cpp \
 		srcs/ModeCmd.cpp \
