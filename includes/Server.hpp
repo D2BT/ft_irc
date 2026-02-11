@@ -18,6 +18,7 @@
 #include <exception>
 #include <sstream>
 #include <fcntl.h>
+#include "ICmd.hpp"
 
 class Channel;
 
@@ -33,11 +34,13 @@ class Server{
 		std::vector<pollfd> _pfds;
 
 		int  acceptNewClient();
+		// Reçoit et traite les données envoyées par un client
 		void receiveFromClient(int fd);
 		bool handleCommand(Client &client, std::string &line);
 		
 	public:
 		Server(int port, std::string password);
+		// Destructeur : libère les ressources
 		~Server();
 		
 		static volatile bool g_running;
@@ -49,14 +52,19 @@ class Server{
 		
 		void sendReply(const Client& client, const std::string& message);
 		void relayMessage(Client& client, const std::string& message);
-		void disconnectClient(int fd);
+		void disconnectClient(int fd);                                      //*
 		void notifyClientQuit(Client& client, const std::string& message);
 		
 		void sendToClient(Client& client, const std::string& message);
 		Channel *createChannel(std::string channelName, std::string password = "");
 		Channel *getChannel(std::string const &channelName) const;
 		std::map<std::string, Channel *> getChannels() const;
+		std::map<int, Client *> getClients() const;
 
+		void sendToAllClient(const std::string& message);
+
+		// Prépare le serveur à écouter les connexions
 		void setup();
+		// Boucle principale : gère les connexions et les messages
 		void run();
 };

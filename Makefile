@@ -9,8 +9,9 @@ OBJ_DIR = obj
 SRC =	srcs/main.cpp \
 		srcs/Exception.cpp \
 		srcs/Server.cpp \
-		srcs/Channel.cpp \
 		srcs/Client.cpp \
+		srcs/Bot.cpp \
+		srcs/Channel.cpp \
 		srcs/JoinCmd.cpp \
 		srcs/KickCmd.cpp \
 		srcs/ModeCmd.cpp \
