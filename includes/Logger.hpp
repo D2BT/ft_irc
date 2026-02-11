@@ -10,6 +10,7 @@ enum LogLevel{
 	INFO = 1,
 	CMD = 2,
 	ERROR = 3,
+	RECIVE = 4
 };
 
 class Logger{
@@ -36,6 +37,10 @@ class Logger{
 				case ERROR:
 					prefix = "[ERROR]";
 					color = RED;
+					break;
+				case RECIVE:
+					prefix = "[RECIVE]";
+					color = ORANGE;
 					break;
 				}
 

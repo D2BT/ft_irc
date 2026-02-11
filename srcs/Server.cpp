@@ -273,6 +273,9 @@ bool Server::handleCommand(Client &client, std::string &line){
 	std::getline(iss, rest);
 	rest = trimLeft(rest);
 
+
+	Logger::log(RECIVE, "la ligne recu est :" + line);
+
 	std::vector<std::string> args;
 	std::string token;
 	std::istringstream argStream(rest);
