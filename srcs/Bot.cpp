@@ -6,7 +6,7 @@
 /*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 10:58:03 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 20:23:00 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/11 10:46:56 by mdsiurds         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,17 @@ void Bot::messageToBadPeople(Server& server){
         if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
             server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % 8]);
                 if (clientBegin->second->getAngryLevel() % 8 == 7){
+                    for (/*all channel ou est le client*/){
+                        std::string msg
+                        server.notifyClientQuit(msg);
+                    }
                     server.disconnectClient(clientBegin->second->getFd());
+                    //msg to all client
+                    
                     /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << clientBegin->second->getFd() << std::endl;
                     continue;
                 }
-                std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
+                //std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
                 clientBegin->second->addLevelAngry(); //fonction dans client a faire
             }
     }
