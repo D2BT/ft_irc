@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by abenabbo, qdebraba, mdsiurds.*
+*This project has been created as part of the 42 curriculum by [abenabbo](https://github.com/Anis-21), [qdebraba](https://github.com/D2BT), [mdsiurds](https://github.com/Maxft68).*
 
 *signed : The Well-Know team des Q_NU*
 
