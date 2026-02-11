@@ -62,5 +62,8 @@ void NickCmd::execute(Server& server, Client& client, const std::vector<std::str
 	if (!client.isRegistered() && !client.getUsername().empty()){
         client.setRegistered(true);
         server.sendReply(client, ":" + server.getServerName() + " 001 " + newNick + " :Welcome to my IRC Network, " + newNick);
+		server.sendReply(client, ":" + server.getServerName() + " 002 " + newNick + " :Your host is " + server.getServerName() + " , running version 1.0");
+		server.sendReply(client, ":" + server.getServerName() + " 003 " + newNick + " :This server was created " + server.getServerCreationDateRPL003());
+		server.sendReply(client, ":" + server.getServerName() + " 004 " + newNick + " " + server.getServerName() + " 1.0 none itkol");
     }
 }

@@ -53,6 +53,17 @@ void Channel::addAdmin(Client *user) {
     return;
 }
 
+void Channel::addOwner(Client *user) {
+    std::vector<Client *>::const_iterator isAdmin = std::find(_admin.begin(), _admin.end(), user);
+    std::vector<Client *>::const_iterator isInChan = std::find(_users.begin(), _users.end(), user);
+    if (isAdmin == _admin.end())
+        _admin.push_back(user);
+    if (isInChan == _users.end())
+        _users.push_back(user);
+    _owner.push_back(user);
+    return;
+}
+
 void Channel::removeAdmin(Client *user) {
     std::vector<Client *>::iterator it = std::find(_admin.begin(), _admin.end(), user);
     if (it != _admin.end())
@@ -111,6 +122,14 @@ void Channel::addInvited(Client *user) {
 
 bool Channel::isOperator(Client *user) const {
     for (std::vector<Client *>::const_iterator it = _admin.begin(); it != _admin.end(); it++){
+        if (*it == user)
+            return true;
+    }
+    return false;
+}
+
+bool Channel::isOwner(Client *user) const {
+    for (std::vector<Client *>::const_iterator it = _owner.begin(); it != _owner.end(); it++){
         if (*it == user)
             return true;
     }
@@ -193,4 +212,8 @@ const char *Channel::NotAdmin::what() const throw(){
 
 std::vector<Client *> Channel::getAdmin() const{
     return _admin;
+}
+
+std::vector<Client *> Channel::getOwner() const{
+    return _owner;
 }

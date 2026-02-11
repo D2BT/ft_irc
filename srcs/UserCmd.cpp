@@ -26,5 +26,8 @@ void UserCmd::execute(Server& server, Client& client, const std::vector<std::str
     if (!client.getNickname().empty()){
         client.setRegistered(true);
         server.sendReply(client, ":" + server.getServerName() + " 001 " + client.getNickname() + " :Welcome to the IRC Network, " + client.getNickname());
+        server.sendReply(client, ":" + server.getServerName() + " 002 " + client.getNickname() + " :Your host is " + server.getServerName() + " , running version 1.0");
+		server.sendReply(client, ":" + server.getServerName() + " 003 " + client.getNickname() + " :This server was created " + server.getServerCreationDateRPL003());
+		server.sendReply(client, ":" + server.getServerName() + " 004 " + client.getNickname() + " " + server.getServerName() + " 1.0 none itkol");
     }
 }

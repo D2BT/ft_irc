@@ -17,6 +17,7 @@ class Channel {
         bool        _restrictedTopic;
         int         _userLimit;
         std::vector<Client *> _admin;
+        std::vector<Client *> _owner;
         std::vector<Client *> _users;
         std::vector<Client *> _invits;
 
@@ -29,6 +30,7 @@ class Channel {
         ~Channel();
         
         void                    addAdmin(Client *user);
+        void                    addOwner(Client *user);
         void                    removeAdmin(Client *user);
         void                    addClient(Client *user);
         void                    removeClient(Client *user);
@@ -49,9 +51,11 @@ class Channel {
         bool                    getModeTopic() const;
         int                     getUserLimit() const;
         std::vector<Client *>   getAdmin() const;
+        std::vector<Client *>   getOwner() const;
 
         bool                    isInChannel(Client *user) const;
         bool                    isOperator(Client *user) const;
+        bool                    isOwner(Client *user) const;
         
         bool                    isInvited(Client *user) const;
         void                    addInvited(Client *user);
