@@ -13,6 +13,7 @@ class Client{
         bool _isAuthenticated;
 		bool _saidHello;
 		int _nbChannelIn;
+		int _angry;
 
 	public:
 		Client();
@@ -35,6 +36,10 @@ class Client{
 		std::string& getBuffer();
 		void addOneChannel();
 		void removeOneChannel();
+		bool isKind() const;
+		int  getNbChannelIn() const;
+		int  getAngryLevel() const;
+		void addLevelAngry();
 		void saidHello();
 
 		void addToBuffer(const std::string& data);

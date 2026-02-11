@@ -32,11 +32,12 @@ class Channel {
         void                    addClient(Client *user);
         void                    removeClient(Client *user);
 
-        std::string const       &getChannelName() const;
-        std::string const       &getChannelTopic() const;
-        std::string const       &getPasswordChannel() const;
-        std::string const       getUserList() const;
-        int                     getNumberOfUsers() const;
+        std::string const &getChannelName() const;
+        std::string const &getChannelTopic() const;
+        std::string const &getPasswordChannel() const;
+        std::string const getUserList() const;
+        std::vector<Client *> getUsers() const;
+        int               getNumberOfUsers() const;
 
         void                    setModeInvite(bool val);
         void                    setModeTopic(bool val);
