@@ -5,7 +5,9 @@
 
 Bot::Bot() : _fd(42), _nickname("BOT_nick"), _username("BOT_user"), _realname("BOT_real"){}
 
-Bot::~Bot(){}
+Bot::~Bot(){
+    close(_fd); // QUENTIN cetait ici !! 
+}
 
 void Bot::setup(int port, std::string password){
     this->_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -48,7 +50,7 @@ void Bot::messageToBadPeople(Server& server){
         if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
             server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % _angry.size()]);
                 if (clientBegin->second->getAngryLevel() % _angry.size() == 7){
-                    std::string reason = "Kick because was not polite !";
+                    std::string reason = clientBegin->second->getNickname() + "Kick because was not polite !";
                     server.notifyClientKick((*clientBegin->second), reason);
                     server.disconnectClient(clientBegin->second->getFd());
                     //msg to all client
