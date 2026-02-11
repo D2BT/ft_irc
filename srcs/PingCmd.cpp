@@ -9,5 +9,5 @@ void PingCmd::execute(Server& server, Client& client, const std::vector<std::str
 		server.sendReply(client, ":" + server.getServerName() + " 409 " + client.getNickname() + " :No origin specified");
 		return;
 	}
-	server.sendReply(client, ":" + server.getServerName() + " PONG :" + args[0]);
+	server.sendReply(client, ":" + server.getServerName() + " PONG " + server.getServerName() + " :" + args[0]);
 }
