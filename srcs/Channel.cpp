@@ -156,7 +156,7 @@ void Channel::broadcastMessage(Server &server, std::string const &message){ // a
         server.sendToClient(*_users[i], message);
 }
 
-void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){ //all withou me
+void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){ //all without me
     for (std::vector<Client *>::iterator it = _users.begin(); it != _users.end(); it++){
         if (*it && *it != &client)
             server.sendToClient(**it, message);
