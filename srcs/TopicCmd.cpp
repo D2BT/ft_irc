@@ -33,8 +33,9 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 			server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + args[0] + " :No topic is set");
 			return;
 		}
-		else
+		else{
 			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + args[0] + " :" + topic);
+		}
 	}
 	else if (args.size() > 1 && channel->getModeTopic()){
 		std::vector<Client *> admin = channel->getAdmin();
@@ -48,9 +49,8 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 			return;
 		}
 		channel->setChannelTopic(args[1]);
-		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + args[0] + " :" + args[1];
+		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + args[0] + " :" + channel->getChannelTopic();
 		channel->broadcastMessage(server, topicChangeMsg);
-
 	}
 	else{
 		channel->setChannelTopic(args[1]);

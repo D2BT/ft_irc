@@ -19,8 +19,10 @@ void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> c
         return;
     }
 
-    if (args.empty())
+    if (args.empty()){
+        server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " JOIN :Not enough parameters");
         return;
+    }
     std::vector<std::string> channelNames = split(args[0], ',');
     std::vector<std::string> keys;
     if (args.size() > 1)
@@ -38,6 +40,7 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
     if (channel == NULL){
         channel = server.createChannel(channelName, key);
         channel->addAdmin(&client);
+        channel->addInvited(&client);
     }
     else {
         if (channel->isInChannel(&client)){
@@ -58,10 +61,13 @@ void JoinCmd::joinChannel(Server &server, Client &client, std::string channelNam
         }
 
     }
-    channel->addClient(&client);
+    if (!channel->getNumberOfUsers())
+        channel->addAdmin(&client);
+    else
+        channel->addClient(&client);
     client.addOneChannel();
     std::string joinMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " JOIN :" + channelName + "\r\n";
-    channel->broadcastMessage(server, joinMsg);
+   channel->broadcastMessage(server, joinMsg);
     if (channel->getChannelTopic().empty())
         server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + channelName + ": No Topic is set" + "\r\n");
     else

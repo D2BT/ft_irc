@@ -6,7 +6,7 @@ ModeCmd::~ModeCmd() {}
 
 void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> const &args) {
     if (!client.isRegistered()){
-        server.sendReply(client, " 451 " + client.getNickname() + " :You have not registered");
+        server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not registered");
         return;
     }
     if (args.size() < 2){
@@ -114,6 +114,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
                     successArgs += " " + args[argsIndex];
                 }
                 argsIndex++;
+                break;
             }
             default :{
 				server.sendReply(client, ":" + server.getServerName() + " 472 " + client.getNickname() + " " + mode + " :Unknown mode char for " + channelName);

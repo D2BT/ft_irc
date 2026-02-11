@@ -5,7 +5,7 @@ InviteCmd::InviteCmd(){}
 InviteCmd::~InviteCmd(){}
 
 void InviteCmd::execute(Server& server, Client& client, const std::vector<std::string>& args){
-    if (args.size() < 2){
+    if (args.empty() || args.size() < 2){
         server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " INVITE :Not enough parameters");
         return;
     }
