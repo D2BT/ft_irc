@@ -160,7 +160,7 @@ int  Server::acceptNewClient(){
 void Server::receiveFromClient(int fd){
 	char buffer[512];
 	// Lit les données envoyées par le client (non-bloquant)
-	size_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0); // ", 0" = comportement par defaut
+	ssize_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0); // ", 0" = comportement par defaut
 
 	// Si bytes_read == 0, le client a fermé la connexion
 	if (bytes_read == 0){
@@ -335,9 +335,9 @@ void Server::sendReply(const Client& client, const std::string& message){
 		}
 		total += bytes;
 	}
-	std::ostringstream msg;
+	/* std::ostringstream msg;
 	msg << "S--> [" << client.getNickname() << "]" << message;
-	Logger::log(DEBUG, msg.str());
+	Logger::log(DEBUG, msg.str()); */
 }
 
 void Server::relayMessage(Client& client, const std::string& message){
@@ -348,9 +348,9 @@ void Server::relayMessage(Client& client, const std::string& message){
         msg << "Erreur sur send() lors du relai a " << client.getNickname();
         Logger::log(ERROR,msg.str());
     }
-    std::ostringstream msg;
+   /*  std::ostringstream msg;
     msg << "S--> Relaye a [" << client.getNickname() << "]" << message;
-    Logger::log(DEBUG, msg.str());
+    Logger::log(DEBUG, msg.str()); */
 }
 
 Client* Server::getClientByNick(const std::string& nick) {
@@ -385,7 +385,7 @@ void Server::run(){
 	while(Server::g_running)
 	{
 		//runbot(start);
-		if ((time(NULL) - start) > 10){
+		if ((time(NULL) - start) > 1000){
 			iRoBot.sendMessage(*this);
 			start = time(NULL);
 		}
@@ -426,9 +426,9 @@ void Server::sendToClient(Client& client, const std::string& message){ //un mess
 		}
 		total += bytes;
 	}
-	std::ostringstream msg;
+	/* std::ostringstream msg;
 	msg << "S--> [" << client.getNickname() << "] " << message;
-	Logger::log(DEBUG, msg.str());
+	Logger::log(DEBUG, msg.str()); */
 }
 
 Channel *Server::getChannel(std::string const &channelName) const {

@@ -61,6 +61,23 @@ You can connect to the server using:
     - `l`: Set user limit for channel
 - **Bonus**: CTCP & DCC (Direct Client-to-Client) transparency for file transfers.
 
+## Usage Examples
+
+Here is a quick reference for the supported commands:
+
+- **Auth**: `/PASS <password>`, `/USER <username> 0 * <realname>`, `/NICK <nickname>`
+- **Join Channel**: `/JOIN <#channel> [key]`
+- **Leave Channel**: `/PART <#channel> [reason]`
+- **Private Message**: `/PRIVMSG <target> <message>`
+- **Topic**: `/TOPIC <#channel> [new_topic]`
+- **Mode**: `/MODE <#channel> <+|-flag> [args]`
+  - *Example:* `/MODE #test +o user1` (Promote user1 to operator)
+  - *Example:* `/MODE #test +k secret` (Set channel password to 'secret')
+  - *Example:* `/MODE #test +l 10` (Limit channel to 10 users)
+- **Invite**: `/INVITE <nickname> <#channel>`
+- **Kick**: `/KICK <#channel> <nickname> [reason]`
+- **Quit**: `/QUIT [reason]`
+
 ## Resources
 
 ### References
@@ -68,6 +85,7 @@ You can connect to the server using:
 - [RFC 2812](https://tools.ietf.org/html/rfc2812) - Client Protocol
 - [Modern IRC Client Protocol](https://modern.ircdocs.horse/) - A more readable documentation of the protocol
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/) - Essential for socket programming
+- [Reply & Error Codes Reference](https://www.irchelp.org/protocol/rfc/chapter6.html) - Extensive listing of server numeric responses and error messages
 
 ### AI Usage
 AI tools (specifically GitHub Copilot / Gemini models) were used in this project. The AI assisted in:
