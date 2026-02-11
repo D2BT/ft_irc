@@ -64,8 +64,8 @@ Server::~Server(){
 	if (_listenfd != -1)
 		close (_listenfd);
 
-	if (_bot.getBotConnected())
-		close (_bot.getFd());
+	// if (_bot.getBotConnected()) QUENTIN TU FAIS DE LA D
+	// 	close (_bot.getFd());
 }
 
 void Server::signalHandler(int signum){
