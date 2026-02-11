@@ -6,7 +6,7 @@
 Bot::Bot() : _fd(42), _nickname("BOT_nick"), _username("BOT_user"), _realname("BOT_real"){}
 
 Bot::~Bot(){
-    close(_fd); // QUENTIN cetait ici !! 
+    close(_fd);
 }
 
 void Bot::setup(int port, std::string password){
@@ -48,9 +48,13 @@ void Bot::messageToBadPeople(Server& server){
     std::map<int, Client *>::iterator clientEnd = clientsList.end();
     for(;clientBegin != clientEnd; clientBegin++){
         if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
-            server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % _angry.size()]);
+            std::string angryMsg = ":bot!bot@" + server.getServerName() + " PRIVMSG " + clientBegin->second->getNickname() + " :" + _angry[clientBegin->second->getAngryLevel() % _angry.size()];
+            server.sendReply(*clientBegin->second, angryMsg);
                 if (clientBegin->second->getAngryLevel() % _angry.size() == 7){
-                    std::string reason = " :Kick car il n'est pas poli.";
+                    std::ostringstream msg;
+                    msg << clientBegin->second->getNickname() << " a été kick par le bot.";
+                    Logger::log(INFO, msg.str());
+                    std::string reason = ":" + clientBegin->second->getNickname() + " a pas dit bonjour donc on lui a niqué sa carte mère (KICK DU SERVER).";
                     server.notifyClientKick((*clientBegin->second), reason);
                     server.disconnectClient(clientBegin->second->getFd());                    
                     continue;
@@ -76,7 +80,7 @@ void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
             itChannel->second->broadcastMessage(server, botMsg);
         }
         else{
-            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() +" :Attention ! Quelqu'un n'a pas dit bonjour.";
+            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() +" :Attention ! Quelqu'un n'a pas dit bonjour ici.";
             itChannel->second->broadcastMessage(server, botMsg);
         }
     }
@@ -92,12 +96,12 @@ void Bot::setStr(){
     _kind.push_back("Surtout n'ecoutez pas Abenabbo, quand il vous propose une sortie velo...");
     _kind.push_back("Et attention a Qdebraba, il aime bronzer sans habits...");
 
-    _angry.push_back(" error 404 : Politesse not found.");
-    _angry.push_back(" connais-tu la politesse ?!");
-    _angry.push_back(" on ne s'est pas bien compris je crois !!");
-    _angry.push_back(" tu connais Vald ? Ben dis bonjour sinon on va te niquer ta carte mere !!");
-    _angry.push_back(" attention, je vais te segfault au visage.");
-    _angry.push_back(" encore un mot et je fais `rm -rf /` sur ta session.");
-    _angry.push_back(" si l'intelligence était un bit, tu serais à 0.");
-    _angry.push_back(" ?!!aller tchao j'te kick. 5...4...3...2...1...");
+    _angry.push_back("Error 404 : Politesse not found.");
+    _angry.push_back("Connais-tu la politesse ?!");
+    _angry.push_back("On ne s'est pas bien compris je crois !!");
+    _angry.push_back("Tu connais Vald ? Ben dis bonjour sinon on va te niquer ta carte mere !!");
+    _angry.push_back("Attention, je vais te segfault au visage.");
+    _angry.push_back("Encore un mot et je fais `rm -rf /` sur ta session.");
+    _angry.push_back("Si l'intelligence était un bit, tu serais à 0.");
+    _angry.push_back("?!!aller tchao j'te kick. 5...4...3...2...1...");
 }
