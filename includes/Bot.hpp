@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mdsiurds <mdsiurds@student.42.fr>          +#+  +:+       +#+        */
+/*   By: quentindebrabant <quentindebrabant@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 11:59:18 by mdsiurds          #+#    #+#             */
-/*   Updated: 2026/02/10 20:17:55 by mdsiurds         ###   ########.fr       */
+/*   Updated: 2026/02/11 11:43:35 by quentindebr      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

@@ -5,8 +5,6 @@
 
 Bot::Bot() : _fd(42), _nickname("BOT_nick"), _username("BOT_user"), _realname("BOT_real"){}
 
-//Bot::Bot(int fd_bot) : _fd(fd_bot), _nickname("BOT_nick"), _username("BOT_user"), _realname("BOT_real"){}
-
 Bot::~Bot(){}
 
 void Bot::setup(int port, std::string password){
@@ -42,54 +40,29 @@ int Bot::getFd()const{
     return(this->_fd);
 }
 
-// void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
-//     static int kind = 0;
-//     bool someoneAngry = false;
-
-//     std::map<int, Client *> clientsList = server.getClients();
-//     std::map<int, Client *>::iterator it = clientsList.begin();
-//     for(;it != clientsList.end(); it++){
-//         //std::cout << "ici" << std::endl;
-//         if (it->second->isKind() == false && it->second->getNbChannelIn() > 0){
-//             someoneAngry = true;
-//             std::cout << "quelqu'un pas gentil ici" << std::endl;
-//             server.sendReply(*it->second, it->second->getNickname() + _angry[it->second->getAngryLevel() % 8]);
-//             if (it->second->getAngryLevel() % 8 == 7){
-//                 server.disconnectClient(it->second->getFd());
-//                 //sendreply all
-//                 /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << it->second->getFd() << std::endl;
-//                 continue;
-//             }
-//             std::cout << "Level angry de " << it->second->getNickname() << "est de" << it->second->getAngryLevel() << std::endl;
-//             it->second->addLevelAngry(); //fonction dans client a faire
-//         }
-//     }
-//     if (someoneAngry == false && ){
-//         server.sendToAllClient(_kind[kind % 6]);
-//         kind++;
-//     }
-// } 
-
 void Bot::messageToBadPeople(Server& server){
     std::map<int, Client *> clientsList = server.getClients();
     std::map<int, Client *>::iterator clientBegin = clientsList.begin();
     std::map<int, Client *>::iterator clientEnd = clientsList.end();
     for(;clientBegin != clientEnd; clientBegin++){
         if (clientBegin->second->isKind() == false && clientBegin->second->getNbChannelIn() > 0){
-            server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % 8]);
-                if (clientBegin->second->getAngryLevel() % 8 == 7){
+            server.sendReply(*clientBegin->second, clientBegin->second->getNickname() + _angry[clientBegin->second->getAngryLevel() % _angry.size()]);
+                if (clientBegin->second->getAngryLevel() % _angry.size() == 7){
+                    std::string reason = "Kick because was not polite !";
+                    server.notifyClientKick((*clientBegin->second), reason);
                     server.disconnectClient(clientBegin->second->getFd());
+                    //msg to all client
+                    
                     /*channel.kickByBot(_nickname)*/ //std::cout << "KICK FD: " << clientBegin->second->getFd() << std::endl;
                     continue;
                 }
-                std::cout << "Level angry de " << clientBegin->second->getNickname() << "est de" << clientBegin->second->getAngryLevel() << std::endl;
                 clientBegin->second->addLevelAngry(); //fonction dans client a faire
             }
     }
 }
 
 void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
-    static int kind = 0;
+    int kind = 0;
 
     std::map<std::string, Channel *> channel = server.getChannels();
     for (std::map<std::string, Channel *>::iterator itChannel = channel.begin(); itChannel != channel.end(); itChannel++){
@@ -101,11 +74,11 @@ void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
             }
         }
         if (itClient == users.end()){
-            std::string botMsg =  ":bot!bot@" + server.getServerName() + " BOTMSG " + itChannel->second->getChannelName() + " :" + _kind[kind % 6];
+            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() + " :" + _kind[kind % _kind.size()];
             itChannel->second->broadcastMessage(server, botMsg);
         }
         else{
-            std::string botMsg =  ":bot!bot@" + server.getServerName() + " BOTMSG " + itChannel->second->getChannelName() +" :WARNING ! Someone is not polite there !";
+            std::string botMsg =  ":bot!bot@" + server.getServerName() + " PRIVMSG " + itChannel->second->getChannelName() +" :WARNING ! Someone is not polite there !";
             itChannel->second->broadcastMessage(server, botMsg);
         }
     }

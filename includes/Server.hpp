@@ -54,6 +54,7 @@ class Server{
 		void relayMessage(Client& client, const std::string& message);
 		void disconnectClient(int fd);                                      //*
 		void notifyClientQuit(Client& client, const std::string& message);
+		void notifyClientKick(Client& client, const std::string& message);
 		
 		void sendToClient(Client& client, const std::string& message);
 		Channel *createChannel(std::string channelName, std::string password = "");

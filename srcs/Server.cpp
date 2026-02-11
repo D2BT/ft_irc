@@ -64,7 +64,8 @@ Server::~Server(){
 	if (_listenfd != -1)
 		close (_listenfd);
 
-	// close le bot ici si il est actif
+	if (_bot.getBotConnected())
+		close (_bot.getFd());
 }
 
 void Server::signalHandler(int signum){
@@ -232,7 +233,22 @@ void Server::notifyClientQuit(Client& client, const std::string& message){
     for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
         if (it->second->isInChannel(&client)){
             it->second->broadcastMessage(*this, message);
+			it->second->removeClient(&client);
         }
+    }
+}
+
+void Server::notifyClientKick(Client& client, const std::string& message){
+    for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
+        if (it->second->isInChannel(&client)){
+            it->second->removeClient(&client);
+        }
+    }
+
+	std::map<int, Client *> allClient = getClients();
+	for (std::map<int, Client *>::const_iterator it = allClient.begin(); it != allClient.end(); it++){
+        if (it->second && it->second != &client)
+            sendToClient((*it->second), message);
     }
 }
 
