@@ -15,7 +15,7 @@ JoinCmd::~JoinCmd() {}
 
 void JoinCmd::execute(Server &server, Client &client, std::vector<std::string> const &args) {
     if (!client.isRegistered()){
-        server.sendReply(client, "451 " + client.getNickname() + " :You have not registered");
+        server.sendReply(client, ":" + server.getServerName() + " 451 " + client.getNickname() + " :You have not registered");
         return;
     }
 
