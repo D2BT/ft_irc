@@ -64,7 +64,7 @@ void Bot::messageToBadPeople(Server& server){
     }
 }
 
-void Bot::sendMessage(/*recuperer le nom du client ET serveur*/Server& server){
+void Bot::sendMessage(Server& server){
     std::map<std::string, Channel *> channel = server.getChannels();
     for (std::map<std::string, Channel *>::iterator itChannel = channel.begin(); itChannel != channel.end(); itChannel++){
         std::vector<Client *> users = itChannel->second->getUsers();
