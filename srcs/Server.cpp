@@ -32,7 +32,7 @@ Server::Server(int port, std::string password): _port(port), _listenfd(-1), _ser
         _commands["KICK"] = new KickCmd();
         _commands["QUIT"] = new QuitCmd();
         _commands["TOPIC"] = new TopicCmd();
-        /*_commands["INVITE"] = new InviteCmd(); */
+        _commands["INVITE"] = new InviteCmd();
     }
     catch (std::bad_alloc & e) {
         for(std::map<std::string, ICmd*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
@@ -247,8 +247,9 @@ void Server::notifyClientKick(Client& client, const std::string& message){
 
 	std::map<int, Client *> allClient = getClients();
 	for (std::map<int, Client *>::const_iterator it = allClient.begin(); it != allClient.end(); it++){
+		std::string kickMessage = ":bot!bot@" + getServerName() + " PRIVMSG " + it->second->getNickname() + " " + message;
         if (it->second && it->second != &client)
-            sendToClient((*it->second), message);
+            sendToClient((*it->second), kickMessage);
     }
 }
 
@@ -321,7 +322,7 @@ bool Server::handleCommand(Client &client, std::string &line){
 }
 
 void Server::sendReply(const Client& client, const std::string& message){
-	std::string fullMessage = ":" + _serverName + " " + message + "\r\n";
+	std::string fullMessage = message + "\r\n";
 
 	size_t total = 0;
 	while (total < fullMessage.size()){
@@ -378,16 +379,13 @@ void Server::run(){
 	p.revents = 0;            // Champ réservé pour les événements détectés par poll (initialisé à 0)
 	_pfds.push_back(p);       // On ajoute cette socket à la liste des sockets surveillées par poll()
 
-	//BOT
-	// int fd_bot = acceptNewClient();
-	// std::cout << "TEST:BOT connected, fd: " << fd_bot << std::endl;
 	Bot iRoBot;
 	iRoBot.setup(this->_port, this->_password);
 
 	while(Server::g_running)
 	{
 		//runbot(start);
-		if ((time(NULL) - start) > 20){
+		if ((time(NULL) - start) > 60){
 			iRoBot.sendMessage(*this);
 			start = time(NULL);
 		}

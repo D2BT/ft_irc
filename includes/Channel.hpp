@@ -9,6 +9,7 @@
 
 class Channel {
     private :
+        int _kind;
         std::string _name;
         std::string _topic;
         std::string _password;
@@ -56,6 +57,9 @@ class Channel {
         void                    addInvited(Client *user);
 
         void                    setChannelTopic(std::string topic);
+        
+        int                     getKind() const;
+        void                    addOneToKind();
 
         void                    broadcastMessage(Server &server, std::string const &message);
         void                    broadcastToOther(Server &server, std::string const &message, Client &client);
