@@ -27,15 +27,22 @@ void PartCmd::execute(Server& server, Client& client, const std::vector<std::str
 		}
 		if (start < list.size()) {
 			std::string channel = list.substr(start);
-			if (!channel.empty())
-			channelsToLeave.push_back(channel);
+			if (!channel.empty() || channel[1])
+				channelsToLeave.push_back(channel);
 		}
 	}
 	else
 		channelsToLeave.push_back(args[0]);
+	
+	for(size_t i = 0; i < channelsToLeave.size(); i++){
+		for (size_t j = 0; j < channelsToLeave[i].size(); j++) {channelsToLeave[i][j] = std::toupper(channelsToLeave[i][j]);}
+	}
 
 	for(size_t i = 0; i < channelsToLeave.size(); i++){
 		Channel* channel = server.getChannel(channelsToLeave[i]);
+
+		if (!channelsToLeave[i][1])
+			continue;
 
 		if (channel == NULL){
 			server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + channelsToLeave[i] + " :No such channel");
@@ -55,6 +62,8 @@ void PartCmd::execute(Server& server, Client& client, const std::vector<std::str
 		channel->broadcastMessage(server, partMessage);
 		channel->removeClient(&client);
 		client.removeOneChannel();
+		if (channel->getNumberOfUsers() == 0)
+			server.removeChannel(channel);
 	}
 
 }

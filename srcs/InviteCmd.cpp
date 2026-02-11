@@ -10,6 +10,7 @@ void InviteCmd::execute(Server& server, Client& client, const std::vector<std::s
         return;
     }
     std::string channelName = args[1];
+    for (size_t i = 0; i < channelName.size(); i++) {channelName[i] = std::toupper(channelName[i]);}
     Channel *channel = server.getChannel(channelName);
     std::string targetName = args[0];
     Client *target = server.getClientByNick(targetName);
@@ -29,7 +30,7 @@ void InviteCmd::execute(Server& server, Client& client, const std::vector<std::s
         server.sendReply(client, ":" + server.getServerName() + " 443 " + client.getNickname() + " " + channelName + " :Is already on channel");
 		return;
     }
-    if (channel->getModeInvite() && !channel->isOperator(&client)){
+    if (channel->getModeInvite() && !channel->isOperator(&client) && !channel->isOwner(&client)){
         server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " " + channelName + " :Youre are not channel operator");
 		return;
     }
