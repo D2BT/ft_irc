@@ -201,7 +201,13 @@ void Server::receiveFromClient(int fd){
 // Déconnecte proprement un client (ferme la socket, retire des listes)
 void Server::disconnectClient(int fd){
 	std::map<int, Client*>::iterator clientIt = _clients.find(fd);
-	if (clientIt != _clients.end()){ //par la suite supprimer le client de tout les channels dans lequels il est 
+	if (clientIt != _clients.end()){ 
+		for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+             std::vector<Client *> users = it->second->getUsers();
+             if (std::find(users.begin(), users.end(), clientIt->second) != users.end()) {
+                 it->second->removeClient(clientIt->second);
+             }
+        }
 		delete clientIt->second;
 		_clients.erase(clientIt);
 	}
@@ -392,7 +398,7 @@ void Server::run(){
 	}
 }
 
-void Server::sendToClient(Client& client, const std::string& message){
+void Server::sendToClient(Client& client, const std::string& message){ //un message a un seul client
 	std::string fullMessage = message + "\r\n";
 
 	size_t total = 0;

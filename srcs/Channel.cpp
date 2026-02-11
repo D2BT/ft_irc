@@ -147,12 +147,12 @@ void Channel::setPassword(std::string password) {
 
 
 
-void Channel::broadcastMessage(Server &server, std::string const &message){
+void Channel::broadcastMessage(Server &server, std::string const &message){ // all AND me
     for (size_t i = 0; i < _users.size(); i++)
         server.sendToClient(*_users[i], message);
 }
 
-void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){
+void Channel::broadcastToOther(Server &server, std::string const &message, Client &client){ //all withou me
     for (std::vector<Client *>::iterator it = _users.begin(); it != _users.end(); it++){
         if (*it && *it != &client)
             server.sendToClient(**it, message);
