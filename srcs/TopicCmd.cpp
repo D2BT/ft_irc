@@ -16,45 +16,42 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 		return;
 	}
 
-	Channel* channel = server.getChannel(args[0]);
+	std::string channelName = args[0];
+	for (size_t i = 0; i < channelName.size(); i++) {channelName[i] = std::toupper(channelName[i]);}
+
+	Channel* channel = server.getChannel(channelName);
 	if (channel == NULL){
-		server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + args[0] + " :No such channel");
+		server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + channelName + " :No such channel");
 		return;
 	}
 
 	if (!channel->isInChannel(&client)){
-		server.sendReply(client, ":" + server.getServerName() + " 442 " + client.getNickname() + " " + args[0] + " :You're not on that channel");
+		server.sendReply(client, ":" + server.getServerName() + " 442 " + client.getNickname() + " " + channelName + " :You're not on that channel");
 		return;
 	}
 
 	if (args.size() == 1){
 		const std::string& topic = channel->getChannelTopic();
 		if (topic.empty()){
-			server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + args[0] + " :No topic is set");
+			server.sendReply(client, ":" + server.getServerName() + " 331 " + client.getNickname() + " " + channelName + " :No topic is set");
 			return;
 		}
 		else{
-			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + args[0] + " :" + topic);
+			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + channelName + " :" + topic);
 		}
 	}
 	else if (args.size() > 1 && channel->getModeTopic()){
-		std::vector<Client *> admin = channel->getAdmin();
-		std::vector<Client *>::const_iterator it = admin.begin();
-		for(; it != admin.end(); it++){
-			if (*it == &client)
-				break;
-		}
-		if (it == admin.end()){
-			server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " " + args[0] + " :You're not channel operator");
+		if (!channel->isOperator(&client) && !channel->isOwner(&client)){
+			server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " " + channelName + " :You're not channel operator");
 			return;
 		}
 		channel->setChannelTopic(args[1]);
-		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + args[0] + " :" + channel->getChannelTopic();
+		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + channelName + " :" + channel->getChannelTopic();
 		channel->broadcastMessage(server, topicChangeMsg);
 	}
 	else{
 		channel->setChannelTopic(args[1]);
-		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + args[0] + " :" + args[1];
+		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + channelName + " :" + args[1];
 		channel->broadcastMessage(server, topicChangeMsg);
 	}
 }

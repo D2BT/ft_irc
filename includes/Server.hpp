@@ -3,12 +3,14 @@
 #include "../includes/Client.hpp"
 #include "../includes/ICmd.hpp"
 #include "../includes/Channel.hpp"
+#include "ICmd.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <cctype>
 #include <cstdlib>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -18,7 +20,7 @@
 #include <exception>
 #include <sstream>
 #include <fcntl.h>
-#include "ICmd.hpp"
+#include <ctime>
 
 class Channel;
 
@@ -60,9 +62,11 @@ class Server{
 		Channel *createChannel(std::string channelName, std::string password = "");
 		Channel *getChannel(std::string const &channelName) const;
 		std::map<std::string, Channel *> getChannels() const;
+		void	removeChannel(Channel* channel);
 		std::map<int, Client *> getClients() const;
 
 		void sendToAllClient(const std::string& message);
+		std::string getServerCreationDateRPL003();
 
 		// Prépare le serveur à écouter les connexions
 		void setup();

@@ -53,12 +53,9 @@ void PrivmsgCmd::execute(Server& server, Client& client, const std::vector<std::
 	std::string target = args[0];
 	std::string message = args[1];
 
-	std::string full = ":" + client.getNickname() + "!" +
-                       client.getUsername() + "@" +
-                       server.getServerName() +
-                       " PRIVMSG " + target + " :" + message;
-
 	if (target[0] == '#'){
+		for (size_t i = 0; i < target.size(); i++) {target[i] = std::toupper(target[i]);}
+		std::string full = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " PRIVMSG " + target + " :" + message;
 		Channel* channel = server.getChannel(target);
         if (!channel) {
 			server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " " + target + " :No such channel");
@@ -74,6 +71,7 @@ void PrivmsgCmd::execute(Server& server, Client& client, const std::vector<std::
 		channel->broadcastToOther(server, full, client);
 	}
 	else{
+		std::string full = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " PRIVMSG " + target + " :" + message;
 		Client* targetClient = server.getClientByNick(target);
 		if (targetClient == NULL){
 			server.sendReply(client, ":" + server.getServerName() + " 401 " + client.getNickname() + " " + target + " :No such nick/channel");
