@@ -24,7 +24,7 @@ static bool	isValidPort(const std::string &s, int &port)
 int main(int argc, char **argv)
 {
 	try{
-		if (argc !=3)
+		if (argc !=3 || !argv[2][0])
 			throw ErrorArg();
 		int port;
 		if (!isValidPort(argv[1], port))
