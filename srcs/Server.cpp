@@ -244,6 +244,8 @@ void Server::notifyClientKick(Client& client, const std::string& message){
     for (std::map<std::string, Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it){
         if (it->second->isInChannel(&client)){
             it->second->removeClient(&client);
+			if (it->second->getNumberOfUsers() == 0)
+				removeChannel(it->second);
         }
     }
 

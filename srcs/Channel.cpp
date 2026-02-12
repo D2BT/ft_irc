@@ -161,6 +161,8 @@ void Channel::setModeTopic(bool val) {
 }
 
 void Channel::setUserLimit(int max) {
+    if (max < getNumberOfUsers())
+        _userLimit = getNumberOfUsers();
     _userLimit = max;
 }
 
