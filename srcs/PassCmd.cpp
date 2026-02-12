@@ -11,7 +11,7 @@ void PassCmd::execute(Server& server, Client& client, const std::vector<std::str
     }
 
 	if (args[0].empty()){
-		 server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " PASS :Not enough parameters");
+		server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " PASS :Not enough parameters");
         return;
 	}
 
