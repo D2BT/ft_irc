@@ -234,6 +234,8 @@ void Server::notifyClientQuit(Client& client, const std::string& message){
         if (it->second->isInChannel(&client)){
             it->second->broadcastMessage(*this, message);
 			it->second->removeClient(&client);
+			if (it->second->getNumberOfUsers() == 0)
+				removeChannel(it->second);
         }
     }
 }
@@ -274,7 +276,7 @@ bool Server::handleCommand(Client &client, std::string &line){
 	rest = trimLeft(rest);
 
 
-	Logger::log(RECIVE, "la ligne recu est :" + line);
+	Logger::log(RECIVE, "la ligne reçu est : " + line);
 
 	std::vector<std::string> args;
 	std::string token;
@@ -467,3 +469,23 @@ void Server::sendToAllClient(const std::string& message){
 		sendToClient(*clientBegin->second, message);
 	}
 };
+
+std::string Server::getServerCreationDateRPL003(){
+	time_t now = time(NULL);
+	struct tm *t = localtime(&now);
+
+	char buffer[128];
+	strftime(buffer, sizeof(buffer), "%a %b %d %Y at %H:%M:%S", t);
+
+	return std::string(buffer);
+}
+
+void	Server::removeChannel(Channel* channel){
+	for(std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++){
+		if (it->second == channel){
+			delete it->second;
+			_channels.erase(it);
+			break; 
+		}
+	}
+}

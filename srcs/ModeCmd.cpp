@@ -15,6 +15,8 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
         return;
     }
     std::string channelName = args[0];
+    for (size_t i = 0; i < channelName.size(); i++) {channelName[i] = std::toupper(channelName[i]);}
+    
     if (channelName[0] != '#'){
         server.sendReply(client, ":" + server.getServerName() + " 476 " + client.getNickname() + " MODE :Bad channel mask");
         return;
@@ -24,7 +26,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
         server.sendReply(client, ":" + server.getServerName() + " 403 " + client.getNickname() + " MODE :No such channel");
         return;
     }
-    if (!channel->isOperator(&client)){
+    if (!channel->isOperator(&client) && !channel->isOwner(&client)){
         server.sendReply(client, ":" + server.getServerName() + " 482 " + client.getNickname() + " MODE :Need operator privs for this action");
         return;
     }
