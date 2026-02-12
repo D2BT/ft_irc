@@ -10,7 +10,8 @@ enum LogLevel{
 	INFO = 1,
 	CMD = 2,
 	ERROR = 3,
-	RECIVE = 4
+	RECIVE = 4,
+	REPLY = 5
 };
 
 class Logger{
@@ -42,6 +43,10 @@ class Logger{
 					prefix = "[RECIVE]";
 					color = ORANGE;
 					break;
+				case REPLY:
+					prefix = "[SERV REPLY]";
+					color = BLUE;
+
 				}
 
 		char time_buff[80];
