@@ -37,7 +37,7 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 			return;
 		}
 		else{
-			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + channelName + " :" + topic);
+			server.sendReply(client, ":" + server.getServerName() + " 332 " + client.getNickname() + " " + channelName + " :" + channel->getChannelTopic());
 		}
 	}
 	else if (args.size() > 1 && channel->getModeTopic()){
@@ -51,7 +51,7 @@ void TopicCmd::execute(Server& server, Client& client, const std::vector<std::st
 	}
 	else{
 		channel->setChannelTopic(args[1]);
-		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + channelName + " :" + args[1];
+		std::string topicChangeMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + server.getServerName() + " TOPIC " + channelName + " :" + channel->getChannelTopic();
 		channel->broadcastMessage(server, topicChangeMsg);
 	}
 }

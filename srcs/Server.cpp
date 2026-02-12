@@ -340,6 +340,9 @@ void Server::sendReply(const Client& client, const std::string& message){
 		}
 		total += bytes;
 	}
+	std::ostringstream msg;
+	msg << "[" << client.getNickname() << "] " << message;
+	Logger::log(REPLY, msg.str());
 	/* std::ostringstream msg;
 	msg << "S--> [" << client.getNickname() << "]" << message;
 	Logger::log(DEBUG, msg.str()); */
@@ -353,6 +356,9 @@ void Server::relayMessage(Client& client, const std::string& message){
         msg << "Erreur sur send() lors du relai a " << client.getNickname();
         Logger::log(ERROR,msg.str());
     }
+	std::ostringstream msg;
+	msg << "[" << client.getNickname() << "] " << message;
+	Logger::log(REPLY, msg.str());
    /*  std::ostringstream msg;
     msg << "S--> Relaye a [" << client.getNickname() << "]" << message;
     Logger::log(DEBUG, msg.str()); */
@@ -431,9 +437,12 @@ void Server::sendToClient(Client& client, const std::string& message){ //un mess
 		}
 		total += bytes;
 	}
+	std::ostringstream msg;
+	msg << "[" << client.getNickname() << "] " << message;
+	Logger::log(REPLY, msg.str());
 	/* std::ostringstream msg;
-	msg << "S--> [" << client.getNickname() << "] " << message;
-	Logger::log(DEBUG, msg.str()); */
+	msg << "[" << client.getNickname() << "] " << message;
+	Logger::log(REPLY, msg.str()); */
 }
 
 Channel *Server::getChannel(std::string const &channelName) const {

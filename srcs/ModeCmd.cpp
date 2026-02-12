@@ -1,5 +1,5 @@
 #include "../includes/ModeCmd.hpp"
-#include <limits>
+#include <climits>
 
 ModeCmd::ModeCmd() {}
 
@@ -92,7 +92,7 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
 
                     if (isNumeric) {
                         long limit = std::atol(limitStr.c_str());
-                        if (limit > 0 && limit <= INT32_MAX) {
+                        if (limit > 0 && limit <= INT_MAX) {
                             channel->setUserLimit(limit);
                             successFlag += "+l";
                             successArgs += " " + limitStr;
