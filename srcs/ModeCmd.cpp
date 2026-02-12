@@ -1,4 +1,5 @@
 #include "../includes/ModeCmd.hpp"
+#include <climits>
 
 ModeCmd::ModeCmd() {}
 
@@ -80,9 +81,23 @@ void ModeCmd::execute(Server &server, Client &client, std::vector<std::string> c
                         server.sendReply(client, ":" + server.getServerName() + " 461 " + client.getNickname() + " MODE +l :Not enough parameters");
                         continue;
                     }
-                    channel->setUserLimit(std::atoi(args[argsIndex].c_str()));
-                    successFlag += "+l";
-                    successArgs += " " + args[argsIndex];
+                    std::string limitStr = args[argsIndex];
+                    bool isNumeric = true;
+                    for (size_t k = 0; k < limitStr.size(); k++) {
+                        if (limitStr[k] < '0' || limitStr[k] > '9') {
+                            isNumeric = false;
+                            break;
+                        }
+                    }
+
+                    if (isNumeric) {
+                        long limit = std::atol(limitStr.c_str());
+                        if (limit > 0 && limit <= INT_MAX) {
+                            channel->setUserLimit(limit);
+                            successFlag += "+l";
+                            successArgs += " " + limitStr;
+                        }
+                    }
                     argsIndex++;
                     continue;
                 }
